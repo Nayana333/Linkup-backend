@@ -5,6 +5,8 @@ import dotenv from 'dotenv';
 import connectDB from "./config/db";
 import userRoutes from './routes/userRoutes'
 import  session  from 'express-session';
+import cors from 'cors'
+import  errorHandler from './middleware/errorHandler'
 
 dotenv.config();
 
@@ -35,13 +37,26 @@ app.use(session({
   },
 }));
 
+app.use(cors({
+  origin:" http://localhost:5173",
+  methods:"GET,HEAD,PUT,PATCH,DELETE,POST",
+  credentials:true
+}))
+
+app.use((req,res,next)=>{
+  console.log(`${req.method} ${req.url}`);
+  next()
+  
+})
+
 //route
 app.use('/api/users', userRoutes);
 
-
-
+app.use(express.json())
+app.use(express.urlencoded({extended:true}))
 
 connectDB();
+app.use( errorHandler)
 
 server.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);

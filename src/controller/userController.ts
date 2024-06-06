@@ -4,13 +4,19 @@ import User from "../model/user/userModel";
 import { UserType } from "../model/user/userType";
 const speakeasy = require('speakeasy');
 import bcrypt from "bcryptjs";
-// import sendVerifyMail from '../utils/sendVerifyMail'
+import sendVerifyMail from '../utils/sendVerifyMail'
+import generateToken from "../utils/generateToken";
+import generateRefreshToken from "../utils/generateRefreshToken";
 
 
 export const registerUser = asyncHandler(async (req: Request, res: Response) => {
-    const { userName, email, password } = req.body;
+    const { userName, email, password ,confirmPassword} = req.body;
+    console.log(req.body);
+    
 
-    if (!userName || !email || !password) {
+   
+    
+    if (!userName || !email || !password || !confirmPassword) {
         res.status(400);
         throw new Error('Please fill all fields');
     }
@@ -31,7 +37,8 @@ export const registerUser = asyncHandler(async (req: Request, res: Response) => 
         digits: 4, 
       });
 
-
+      console.log(otp);
+      
       const sessionData=req.session!;
       sessionData.userDetails={userName,email,password}
       sessionData.otp=otp;
@@ -40,7 +47,7 @@ export const registerUser = asyncHandler(async (req: Request, res: Response) => 
       const salt = await bcrypt.genSalt(10);
       const hashedPassword=await bcrypt.hash(password,salt)
       sessionData.userDetails!.password = hashedPassword;
-    //   sendVerifyMail(req, userName, email);
+     sendVerifyMail(req, userName, email);
       res.status(200).json({ message: "OTP sent for verification", email, otp });
       
 
@@ -51,6 +58,8 @@ export const registerUser = asyncHandler(async (req: Request, res: Response) => 
 
 export const verifyOTP = asyncHandler(async (req: Request, res: Response) => {
     const { otp } = req.body;
+    console.log("dfcsdcasd");
+    
 
     console.log(`Received OTP: ${otp}`);
     console.log(`Type of received OTP: ${typeof otp}`);
@@ -122,7 +131,35 @@ export const resendOTP=asyncHandler(async(req:Request,res:Response)=>{
         return;       
     }
     console.log('new OTP'+otp);
-   // sendVerifyMail(req, userDetails.username, userDetails.email);
-res.status(200).json({message:'new otp sent for verification '})  // send email and otp with it  
+
+   sendVerifyMail(req, userDetails.userName, userDetails.email);
+
+res.status(200).json({message:'new otp sent for verification ',email,otp}) 
 
 })
+
+
+export const login =asyncHandler(async(req:Request,res:Response)=>{
+    const {email,password}=req.body
+
+    const user= await User.findOne({email})
+    if(user){
+       if( user.isBlocked){
+        res.status(400)
+        throw new Error('you are temporarly suspended')
+       }
+    }
+    if(user &&(await bcrypt.compare(password,user.password))){
+        const userData=await User.findOne({email},{password:0})
+
+        res.json({message:'logged successfully',
+            user:userData,
+            token:generateToken(user.id),
+            refreshToken:generateRefreshToken(user.id)
+        })
+    }
+
+
+})
+
+
