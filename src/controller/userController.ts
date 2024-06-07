@@ -229,7 +229,38 @@ export const forgotOtp =asyncHandler(async(req:Request,res:Response)=>{
 })
 
 
+export const resetPsw=asyncHandler(async(req:Request,res:Response)=>{
+const{password,confirmPassword}=req.body
 
+
+const sessionData=req.session;
+console.log(sessionData.email);
+
+
+if (!sessionData || !sessionData.email) {
+    res.status(400);
+    throw new Error('No session data found');
+  }
+
+
+if(password !== confirmPassword){
+    res.status(400)
+    throw new Error("password do not match")
+}
+
+const user=await User.findOne({email:sessionData.email})
+if(!user){
+    res.status(400)
+    throw new Error('user not found')
+}
+
+
+const salt =await bcrypt.genSalt(10);
+const hashedPassword=await bcrypt.hash(password,salt)
+user.password=hashedPassword
+await user.save()
+res.status(200).json({ message: 'Password has been reset successfully' });
+})
 
 
 
