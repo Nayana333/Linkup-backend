@@ -38,7 +38,7 @@ app.use(session({
 }));
 
 app.use(cors({
-  origin:" http://localhost:5173",
+  origin: "http://localhost:5173",
   methods:"GET,HEAD,PUT,PATCH,DELETE,POST",
   credentials:true
 }))

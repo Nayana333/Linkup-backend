@@ -58,7 +58,7 @@ export const registerUser = asyncHandler(async (req: Request, res: Response) => 
 
 export const verifyOTP = asyncHandler(async (req: Request, res: Response) => {
     const { otp } = req.body;
-    console.log("dfcsdcasd");
+    
     
 
     console.log(`Received OTP: ${otp}`);
@@ -114,12 +114,16 @@ export const verifyOTP = asyncHandler(async (req: Request, res: Response) => {
 export const resendOTP=asyncHandler(async(req:Request,res:Response)=>{
 
     const email=req.body
+    
+    
 
     const otp = speakeasy.totp({
         secret: speakeasy.generateSecret({ length: 20 }).base32,
         digits: 4, 
       });
 
+      console.log(otp);
+      
     const sessiondata=req.session!
     sessiondata.otp=otp;
     sessiondata.otpGeneratedTime=Date.now()
@@ -141,6 +145,8 @@ res.status(200).json({message:'new otp sent for verification ',email,otp})
 
 export const login =asyncHandler(async(req:Request,res:Response)=>{
     const {email,password}=req.body
+    console.log('reached');
+    
 
     const user= await User.findOne({email})
     if(user){
@@ -156,10 +162,81 @@ export const login =asyncHandler(async(req:Request,res:Response)=>{
             user:userData,
             token:generateToken(user.id),
             refreshToken:generateRefreshToken(user.id)
+           
         })
     }
 
 
 })
+
+
+export const forgotPsw=asyncHandler(async(req:Request,res:Response)=>{
+    const {email}=req.body  
+    console.log(email);
+     
+    const user =await User.findOne({email})
+    if (user) {
+        const otp = speakeasy.totp({
+          secret: speakeasy.generateSecret({ length: 20 }).base32,
+          digits: 4, 
+        });
+        console.log(otp);
+        const sessionData=req.session!;
+        sessionData.otp=otp;
+        sessionData.otpGeneratedTime=Date.now()
+        sessionData.email=email;
+        sendVerifyMail(req,user.userName,user.email)
+        res.status(200).json({message:'new otp sent for verification ',email,otp}) 
+
+    }else{
+        res.status(400)
+        throw new Error('not User Found')
+    }
+})
+
+
+export const forgotOtp =asyncHandler(async(req:Request,res:Response)=>{
+    const {otp}=req.body
+
+    if(!otp){
+        res.status(400)
+        throw new Error('please provide otp')
+    }
+
+    const sessionData=req.session;
+    const storedOtp=sessionData.otp
+    if(!storedOtp || otp !== storedOtp){
+        res.status(400)
+        throw new Error('invalid otp')
+    }
+
+    const otpGeneratedTime=sessionData.otpGeneratedTime || 0;
+    const currentTime=Date.now()
+    const otpExpirationTime=60 * 1000
+    if (currentTime - otpGeneratedTime > otpExpirationTime) {
+        res.status(400);
+        throw new Error("OTP has expired");
+      }
+
+    delete sessionData.otp;
+    delete sessionData.otpGeneratedTime
+   
+    
+    
+    res.status(200).json({ message: "OTP has been verified. Please reset password" ,email:sessionData?.email});
+
+
+})
+
+
+
+
+
+
+
+
+
+
+
 
 
