@@ -260,6 +260,52 @@ res.status(200).json({ message: 'Password has been reset successfully' });
 })
 
 
+export const googleAuth = asyncHandler(async (req: Request, res: Response) => {
+    const { userName, email } = req.body;
+  
+    try {
+      let user = await User.findOne({ email });
+  
+      if (user) {
+        if (user.isBlocked) {
+          res.status(400).json({ message: "User is blocked" });
+          return;
+        }
+  
+        const userData = await User.findOne({ email }, { password: 0 });
+  
+        res.json({
+          message: "Login Successful",
+          user: userData,
+          token: generateToken(user.id),
+          refreshToken: generateRefreshToken(user.id)
+        });
+      } else {
+        const randomPassword = Math.random().toString(36).slice(-8);
+        const hashedPassword = await bcrypt.hash(randomPassword, 10);
+  
+        const newUser = new User({
+          userName,
+          email,
+          password: hashedPassword,
+          isGoogle: true,
+        });
+  
+        await newUser.save();
+  
+        const userData = await User.findOne({ email }, { password: 0 });
+  
+        res.json({
+          message: "Login Successful",
+          user: userData,
+          token: generateToken(newUser.id),
+        });
+      }
+    } catch (error) {
+      console.error("Error in Google authentication:", error);
+      res.status(500).json({ message: "Server error" });
+    }
+  });
 
 
 
