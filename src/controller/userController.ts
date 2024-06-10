@@ -158,7 +158,6 @@ export const login =asyncHandler(async(req:Request,res:Response)=>{
         res.json({message:'logged successfully',
             user:userData,
             token:generateToken(user.id),
-            refreshToken:generateRefreshToken(user.id)
            
         })
     }
