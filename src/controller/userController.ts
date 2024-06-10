@@ -145,9 +145,6 @@ res.status(200).json({message:'new otp sent for verification ',email,otp})
 
 export const login =asyncHandler(async(req:Request,res:Response)=>{
     const {email,password}=req.body
-    console.log('reached');
-    
-
     const user= await User.findOne({email})
     if(user){
        if( user.isBlocked){
@@ -234,7 +231,7 @@ const{password,confirmPassword}=req.body
 
 
 const sessionData=req.session;
-console.log(sessionData.email);
+
 
 
 if (!sessionData || !sessionData.email) {
@@ -242,6 +239,7 @@ if (!sessionData || !sessionData.email) {
     throw new Error('No session data found');
   }
 
+console.log(password,confirmPassword);
 
 if(password !== confirmPassword){
     res.status(400)
