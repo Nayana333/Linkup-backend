@@ -39,7 +39,7 @@ import { Document,Date,Types } from "mongoose";
     skills?:string;
     resume?:string;
     gender?:string;
-    dayeOfBirth:Date;
+    dateOfBirth:Date;
     designation:string;
     fullname?:string;
 
