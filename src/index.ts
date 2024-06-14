@@ -8,6 +8,7 @@ import  session  from 'express-session';
 import cors from 'cors'
 import  errorHandler from './middleware/errorHandler'
 import adminRoute from "./routes/adminRoute"
+import postRoutes from './routes/postRoutes'
 
 dotenv.config();
 
@@ -53,6 +54,7 @@ app.use((req,res,next)=>{
 //route
 app.use('/api/users', userRoutes);
 app.use('/api/admin',adminRoute);
+app.use('/api/post',postRoutes)
 
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
