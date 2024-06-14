@@ -141,6 +141,8 @@ export const resendOTP = asyncHandler(async (req: Request, res: Response) => {
 
 export const login = asyncHandler(async (req: Request, res: Response) => {
   const { email, password } = req.body
+  console.log(req.body);
+  
   const user = await User.findOne({ email })
   if (user) {
     if (user.isBlocked) {
@@ -308,6 +310,8 @@ export const googleAuth = asyncHandler(async (req: Request, res: Response) => {
 export const setPreferences = async (req: Request, res: Response) => {
   try {
     const { userId, userType, isHiring } = req.body;
+    console.log(req.body);
+    
     
     // The filter parameter for findOne should be an object
     const user = await User.findOne({ _id: userId });
@@ -318,7 +322,7 @@ export const setPreferences = async (req: Request, res: Response) => {
       user.isHiring = isHiring === 'isHiring';
 
       await user.save();
-      res.status(200).json({ message: 'User updated' });
+      res.status(200).json({ message: 'User updated',user });
     }
   } catch (error) {
     console.error("Error in updating user", error);
