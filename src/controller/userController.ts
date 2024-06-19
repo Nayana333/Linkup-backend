@@ -80,7 +80,7 @@ export const verifyOTP = asyncHandler(async (req: Request, res: Response) => {
   const currentTime = Date.now();
   const expiredTime = 60 * 1000;
 
-
+  
 
   if (currentTime - otpGeneratedTime > expiredTime) {
     res.status(400);
@@ -383,6 +383,21 @@ export const basicInformation = async (req: Request, res: Response) => {
   }
 };
 
+export const setUserRole=async(req:Request,res:Response)=>{
+  try{
+    const{userId,isHiring}=req.body
+    const user=await User.findById(userId)
+    if(!user){return res.status(404).json({message:'user not found'})}
+  user.isHiring=isHiring
+await user.save()
+res.status(200).json({message:'user updated successfully',user})
+  }catch(error){
+    console.log('error updating user:',error);
+    res.status(500).json({message:'Internal server error'})
+    
+  }
+
+}
 
 
 
