@@ -28,7 +28,7 @@ export const addPost = asyncHandler(async (req: Request, res: Response) => {
 
     const addedPost = await Post.findOne({ _id: post._id, isBlocked: false, isDeleted: false }).populate({
         path: 'userId',
-        select: 'username profileUrl'
+        select: 'userName profileUrl'
     }).sort({ date: -1 });
 
     if (!addedPost) {
@@ -44,11 +44,11 @@ export const getPost = asyncHandler(async (req: Request, res: Response) => {
     const posts = await Post.find({ isBlocked: false, isDeleted: false })
       .populate({
         path: 'userId',
-        select: 'username profileImageUrl'
+        select: 'userName profileImageUrl'
       })
       .populate({
         path: 'likes',
-        select: 'username profileImageUrl'
+        select: 'userName profileImageUrl'
       })
       .sort({ date: -1 });
   
@@ -83,7 +83,7 @@ export const editPost = asyncHandler(async (req: Request, res: Response) => {
             const posts = await Post.find({ isBlocked: false, isDeleted: false })
                 .populate({
                     path: 'userId',
-                    select: 'username profileUrl'
+                    select: 'userName profileUrl'
                 })
                 .sort({ date: -1 });
 
@@ -110,7 +110,7 @@ export const deletePost=asyncHandler(async(req:Request,res:Response)=>{
     await post.save()
     const posts=await User.find({userId:userId,isBlocked:false,isDeleted:false}).populate({
         path:userId,
-        select:'username  profileImageUrl'
+        select:'userName  profileImageUrl'
     }).sort({date:-1})
 
     res.status(200).json({ posts });
