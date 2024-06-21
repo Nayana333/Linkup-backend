@@ -1,6 +1,8 @@
 import Post from "../model/post/postModel";
 import { Request, Response } from "express";
 import asyncHandler from "express-async-handler";
+import User from "../model/user/userModel";
+import { isBlock } from "typescript";
 
 export const addPost = asyncHandler(async (req: Request, res: Response) => {
     const { userId, imageUrl, title, description, hideLikes, hideComment } = req.body;
@@ -38,26 +40,20 @@ export const addPost = asyncHandler(async (req: Request, res: Response) => {
 });
 
 
-export const getPost=asyncHandler(async(req:Request,res:Response)=>{
-
-    const id=req.body.userId
- 
-    const post=await Post.find({isBlocked:false,isDeleted:false}).populate({
-        path:id,
-        select:'username profileUrl'
-
-    }).sort({date:-1})
-
-    if(post.length===0){
-        res.status(400)
-        throw new Error('no post added')
-        
-    }
-
-    res.status(200).json({message:'post added  successfully'})
-
-})
-
+export const getPost = asyncHandler(async (req: Request, res: Response) => {
+    const posts = await Post.find({ isBlocked: false, isDeleted: false })
+      .populate({
+        path: 'userId',
+        select: 'username profileImageUrl'
+      })
+      .populate({
+        path: 'likes',
+        select: 'username profileImageUrl'
+      })
+      .sort({ date: -1 });
+  
+    res.status(200).json(posts);
+  });
 
 
 export const editPost = asyncHandler(async (req: Request, res: Response) => {
@@ -99,3 +95,26 @@ export const editPost = asyncHandler(async (req: Request, res: Response) => {
         
     }
 });
+
+export const deletePost=asyncHandler(async(req:Request,res:Response)=>{
+
+    const {postId,userId}=req.body
+    console.log(postId,userId);
+    const post=await Post.findById(postId)
+    if(!post){
+        res.status(404)
+        throw new Error('post cannot be found')
+    }
+    
+    post.isDeleted=true
+    await post.save()
+    const posts=await User.find({userId:userId,isBlocked:false,isDeleted:false}).populate({
+        path:userId,
+        select:'username  profileImageUrl'
+    }).sort({date:-1})
+
+    res.status(200).json({ posts });
+
+});
+
+
