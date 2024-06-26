@@ -4,15 +4,20 @@ import Comment from '../model/commets/commentModel'
 import Post from '../model/post/postModel'
 import { createNotification } from '../utils/notificationSetter';
 import mongoose from 'mongoose';
-import { timeStamp } from 'console';
+import { log, timeStamp } from 'console';
 
 
 export const getAllPostComment=asyncHandler(async(req:Request,res:Response)=>{
+    
     const postId=req.body.postId
     const comments=await Comment.find({postId:postId,isDeleted:false}).populate({
         path:'userId',
         select:'userName profileImageUrl'
     })
+    .populate({
+        path: 'replyComments.userId',
+        select: 'userName profileImageUrl',
+      })
     res.status(200).json({comments})
 })
 
@@ -47,13 +52,16 @@ export const addComment=asyncHandler(async(req:Request,res:Response)=>{
     const comments=await Comment.find({postId:postId,isDeleted:false}).populate({
         path:'userId',
         select:'userName profileImageUrl'
-    })
+    })  .populate({
+        path: 'replyComments.userId',
+        select: 'userName profileImageUrl',
+      })
     res.status(200).json({ message: 'Comment added successfully', comments });
 })
 
 export const replyComment=asyncHandler(async(req,res)=>{
 
-    const {commentId,userId,resplyComment}=req.body
+    const {commentId,userId,replyComment}=req.body
 
     const comment=await Comment.findById(commentId)
     if(!comment){
@@ -78,25 +86,40 @@ export const replyComment=asyncHandler(async(req,res)=>{
         path: 'replyComments.userId',
         select: 'userName profileImageUrl',
       })
+      
+      console.log(comments,"dscasDasdqdqws");
+      
       res.status(200).json({ message: 'Reply comment added successfully', comments });
 
 })
 
 
-export const deleteComment=asyncHandler(async(req:Request,res:Response)=>{
-    const commentId=req.query;
-    const comment=await Comment.findById(commentId)
-    if(!comment){
-        res.status(404)
-        throw new Error('comment not found') 
+
+
+export const deleteComment = asyncHandler(async (req: Request, res: Response) => {
+    const commentId = req.query.commentId as string;  // Ensure correct extraction
+    console.log(commentId);
+   
+    if (!commentId) {
+        res.status(400);
+        throw new Error('Comment ID is required');
     }
-    comment.isDeleted=true
-    await comment.save()
-    const comments=await Comment.find({postId:comment.postId,isDeleted:false}).populate({
-        path:'userId',
-        select:'userName profileImageUrl'
-    })
 
-    res.status(200).json({ message: "Comment deleted successfully", comments });
+    const comment = await Comment.findById(commentId);
+    console.log(comment);
 
-})
+    if (!comment) {
+        res.status(404);
+        throw new Error('Comment not found');
+    }
+
+    comment.isDeleted = true;
+    await comment.save();
+
+    const comments = await Comment.find({ postId: comment.postId, isDeleted: false }).populate({
+        path: 'userId',
+        select: 'userName profileImageUrl'
+    });
+
+    res.status(200).json({ message: 'Comment deleted successfully', comments });
+});

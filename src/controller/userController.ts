@@ -370,6 +370,10 @@ export const basicInformation = async (req: Request, res: Response) => {
     }
 
     if (imageUrl) {
+      
+      
+      console.log(imageUrl);
+      
       user.profileImageUrl = imageUrl;
     }
 

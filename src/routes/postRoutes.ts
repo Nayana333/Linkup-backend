@@ -1,15 +1,18 @@
 import express from 'express'
 const router=express.Router()
-import { addPost,getPost ,deletePost,editPost} from '../controller/postController'
-import{getAllPostComment,addComment,replyComment} from '../controller/commentController'
+import { addPost,getPost ,deletePost,editPost,likePost,getUserPost} from '../controller/postController'
+import{getAllPostComment,addComment,replyComment, deleteComment} from '../controller/commentController'
+import { protect } from '../middleware/auth';
 
-
-router.post('/addpost',addPost)
-router.get('/getAllPosts',getPost)
-router.delete('/deletePost',deletePost)
-router.put('/editPost',editPost)
-router.post('/get-post-comments',getAllPostComment);
-router.post('addComment',addComment)
-router.post('replyComment',replyComment)
+router.post('/addpost',protect,addPost)
+router.get('/getAllPosts',protect,getPost)
+router.delete('/deletePost',protect,deletePost)
+router.put('/editPost',protect,editPost)
+router.post('/getAllPostComments',protect,getAllPostComment);
+router.post('/addComment',protect,addComment)
+router.post('/replyComment',protect,replyComment)
+router.post('/likePost',protect,likePost)
+router.post('/getUserPost',getUserPost)
+router.get('/deleteComment',deleteComment)
 
 export default router

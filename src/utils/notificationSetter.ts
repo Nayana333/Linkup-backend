@@ -1,30 +1,25 @@
+
 import { Types } from 'mongoose';
 import Notification from '../model/notification/notificationModel';
-import { INotification } from '../model/notification/notificationType'
-interface NotificationArgs {
-  senderId: Types.ObjectId|undefined|any;
-  receiverId: Types.ObjectId|undefined|any;
-  message: string|any;
-  link: string|any;
-  read?: boolean;
-  jobId?: Types.ObjectId|undefined|any;
-  applicationId?: Types.ObjectId|undefined|any;
-  postId?: Types.ObjectId|undefined|any;
-}
+import { INotification } from '../model/notification/notificationType';
 
+interface NotificationArgs {
+  senderId: Types.ObjectId | undefined | any;
+  receiverId: Types.ObjectId | undefined | any;
+  message: string | any;
+  link: string | any;
+  read?: boolean;
+  postId?: Types.ObjectId | undefined | any;
+}
 
 export const createNotification = async (args: NotificationArgs): Promise<INotification> => {
   try {
-    
-    
     const {
       senderId,
       receiverId,
       message,
       link,
-      read = false, 
-    //   jobId,
-      applicationId,
+      read = false,
       postId,
     } = args;
 
@@ -34,8 +29,6 @@ export const createNotification = async (args: NotificationArgs): Promise<INotif
       message,
       link,
       read,
-    //   jobId,
-      applicationId,
       postId,
     });
 

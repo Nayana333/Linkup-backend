@@ -3,6 +3,9 @@ import { Request, Response } from "express";
 import asyncHandler from "express-async-handler";
 import User from "../model/user/userModel";
 import { isBlock } from "typescript";
+import Notification from "../model/notification/notificationModel";
+import { createNotification } from '\../utils/notificationSetter';
+
 
 export const addPost = asyncHandler(async (req: Request, res: Response) => {
     const { userId, imageUrl, title, description, hideLikes, hideComment } = req.body;
@@ -26,9 +29,9 @@ export const addPost = asyncHandler(async (req: Request, res: Response) => {
         throw new Error('Cannot add post');
     }
 
-    const addedPost = await Post.findOne({ _id: post._id, isBlocked: false, isDeleted: false }).populate({
+    const addedPost = await Post.find({ isBlocked: false, isDeleted: false }).populate({
         path: 'userId',
-        select: 'userName profileUrl'
+        select: 'userName profileImageUrl'
     }).sort({ date: -1 });
 
     if (!addedPost) {
@@ -36,7 +39,10 @@ export const addPost = asyncHandler(async (req: Request, res: Response) => {
         throw new Error('No post added');
     }
 
-    res.status(200).json({ message: 'Post added successfully', post: addedPost });
+
+    console.log('addpost',addedPost);
+    
+    res.status(200).json({ message: 'Post added successfully', posts: addedPost });
 });
 
 
@@ -96,11 +102,12 @@ export const editPost = asyncHandler(async (req: Request, res: Response) => {
     }
 });
 
-export const deletePost=asyncHandler(async(req:Request,res:Response)=>{
+export const deletePost = asyncHandler(async(req:Request,res:Response)=>{
 
     const {postId,userId}=req.body
-    console.log(postId,userId);
-    const post=await Post.findById(postId)
+    console.log(req.body);
+    const post=await Post.findById(postId);
+
     if(!post){
         res.status(404)
         throw new Error('post cannot be found')
@@ -118,3 +125,64 @@ export const deletePost=asyncHandler(async(req:Request,res:Response)=>{
 });
 
 
+
+
+
+export const likePost = asyncHandler(async (req: Request, res: Response) => {
+    const { postId, userId } = req.body;
+    
+    const post = await Post.findById(postId);
+    if (!post) {
+      res.status(404);
+      throw new Error('Post not found');
+    }
+  
+    const isLiked = post.likes.includes(userId);
+    if (isLiked) {
+      await Post.findOneAndUpdate({ _id: postId }, { $pull: { likes: userId } }, { new: true });
+      await Notification.findOneAndDelete({ senderId: userId, receiverId: post.userId, message: 'liked your post' });
+    } else {
+      const notificationData:any = {
+        senderId: userId,
+        receiverId: post.userId,
+        message: 'liked your post',
+        link: `/visit-profile/posts/${post.userId}`,
+        read: false,
+        postId: postId, // assuming postId is to be passed
+      };
+      await createNotification(notificationData);
+      await Post.findOneAndUpdate({ _id: postId }, { $push: { likes: userId } }, { new: true });
+    }
+  
+    const posts = await Post.find({ userId: post.userId, isBlocked: false, isDeleted: false }).populate({
+      path: 'userId',
+      select: 'username profileImageUrl'
+    }).sort({ date: -1 });
+  
+    res.status(200).json({ posts });
+  });
+
+
+  export const getUserPost = asyncHandler(async (req: Request, res: Response) => {
+
+  
+  
+    const id = req.body.userId;
+    console.log(id);
+   
+    
+  
+    const posts = await Post.find({userId:id, isBlocked: false, isDeleted:false  }).populate({
+      path: 'userId',
+      select: 'userName profileImageUrl'
+    }).sort({date:-1});
+  
+    if (posts.length==0) {  
+      res.status(400);
+      throw new Error("No Post available");
+    }
+    console.log(posts,"userPostsssssssssssssssssss");
+    
+    res.status(200).json(posts);
+  
+  });
