@@ -12,7 +12,9 @@ interface PostInterface extends Document {
     hideComment: boolean;
     hideLikes:boolean;
     isDeleted:boolean;
+    isEdited:boolean;
     timestamp: Date;
+
 }
 
 export default PostInterface;

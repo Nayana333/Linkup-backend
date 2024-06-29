@@ -5,6 +5,8 @@ import User from "../model/user/userModel";
 import { isBlock } from "typescript";
 import Notification from "../model/notification/notificationModel";
 import { createNotification } from '\../utils/notificationSetter';
+import Report from '../model/reports/reportModel'
+import { log } from "console";
 
 
 export const addPost = asyncHandler(async (req: Request, res: Response) => {
@@ -47,6 +49,10 @@ export const addPost = asyncHandler(async (req: Request, res: Response) => {
 
 
 export const getPost = asyncHandler(async (req: Request, res: Response) => {
+
+  const { userId,  page } = req.body;
+  const limit = 5;
+  const skip = (page - 1) * limit;
     const posts = await Post.find({ isBlocked: false, isDeleted: false })
       .populate({
         path: 'userId',
@@ -55,52 +61,63 @@ export const getPost = asyncHandler(async (req: Request, res: Response) => {
       .populate({
         path: 'likes',
         select: 'userName profileImageUrl'
-      })
+      }).skip(skip)
+      .limit(limit)
       .sort({ date: -1 });
-  
+      console.log(posts.length);
+      
     res.status(200).json(posts);
   });
 
 
-export const editPost = asyncHandler(async (req: Request, res: Response) => {
-    try {
-        const { userId, postId, title, description, hideLikes, hideComment } = req.body;
 
-        const post = await Post.findById(postId);
-        if (!post) {
-            res.status(400);
-            throw new Error('Post not found');
-        } else {
-            if (title) {
-                post.title = title;
-            }
-            if (description) {
-                post.description = description;
-            }
-            if (hideLikes !== undefined) {
-                post.hideLikes = hideLikes;
-            }
-            if (hideComment !== undefined) {
-                post.hideComment = hideComment;
-            }
-
-            await post.save();
-
-            const posts = await Post.find({ isBlocked: false, isDeleted: false })
-                .populate({
-                    path: 'userId',
-                    select: 'userName profileUrl'
-                })
-                .sort({ date: -1 });
-
-            res.status(200).json({ message: 'Post updated successfully', posts });
-        }
-    } catch (error){
-        console.log(error);
-        res.status(500).json({message:'internal server error'})
-        
-    }
-});
+  
+  export const editPost = asyncHandler(async (req: Request, res: Response) => {
+      try {
+          const { userId, postId, title, description, hideLikes, hideComment } = req.body;
+  
+          const post = await Post.findById(postId);
+          if (!post) {
+              res.status(400);
+              throw new Error('Post not found');
+          } else {
+              if (title) {
+                  post.title = title;
+              }
+              if (description) {
+                  post.description = description;
+              }
+              if (hideLikes !== undefined) {
+                  post.hideLikes = hideLikes;
+              }
+              if (hideComment !== undefined) {
+                  post.hideComment = hideComment;
+              }
+  
+              // Set isEdited to true
+              post.isEdited = true;
+  
+              await post.save();
+  
+              const posts = await Post.find({ isBlocked: false, isDeleted: false })
+                  .populate({
+                      path: 'userId',
+                      select: 'userName profileImageUrl'
+                  })
+                  .populate({
+                      path: 'likes',
+                      select: 'userName profileImageUrl'
+                  })
+                  .sort({ date: -1 });
+  
+              res.status(200).json({ message: 'Post updated successfully', posts });
+          }
+      } catch (error) {
+          console.log(error);
+          res.status(500).json({ message: 'Internal server error' });
+      }
+  });
+  
 
 export const deletePost = asyncHandler(async(req:Request,res:Response)=>{
 
@@ -181,8 +198,43 @@ export const likePost = asyncHandler(async (req: Request, res: Response) => {
       res.status(400);
       throw new Error("No Post available");
     }
-    console.log(posts,"userPostsssssssssssssssssss");
     
     res.status(200).json(posts);
   
   });
+
+
+  export const reportPost=asyncHandler(async(req:Request,res:Response)=>{
+    const {userId,postId,cause}=req.body
+    console.log(req.body);
+    const existingReport=await Report.findOne({userId,postId})
+    if(existingReport){
+      res.status(400)
+      throw new Error('you are already Reported')
+    }
+
+    const report=new Report({
+      userId,
+      postId,
+      cause
+    })
+
+    await report.save()
+
+
+    const reportCount=await Report.countDocuments({postId})
+
+    const REPORT_THRESHOLD=3
+
+    if (reportCount >= REPORT_THRESHOLD) {
+      await Post.findByIdAndUpdate(postId, { isBlocked: true });
+      res
+        .status(200)
+        .json({ message: "Post has been blocked due to multiple reports." });
+      return;
+    }
+    res.status(200).json({ message: "Post has been reported successfully." });
+
+
+
+  })

@@ -46,6 +46,10 @@ const PostSchema = new Schema<PostInterface>({
     isDeleted:{
         type:Boolean,
         default:false
+    },
+    isEdited:{
+        type:Boolean,
+        default:false
     }
     
 },{timestamps:true});
