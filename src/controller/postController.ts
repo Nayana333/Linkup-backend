@@ -7,6 +7,7 @@ import Notification from "../model/notification/notificationModel";
 import { createNotification } from '\../utils/notificationSetter';
 import Report from '../model/reports/reportModel'
 import { log } from "console";
+import { start } from "repl";
 
 
 export const addPost = asyncHandler(async (req: Request, res: Response) => {
@@ -64,7 +65,6 @@ export const getPost = asyncHandler(async (req: Request, res: Response) => {
       }).skip(skip)
       .limit(limit)
       .sort({ date: -1 });
-      console.log(posts.length);
       
     res.status(200).json(posts);
   });
@@ -132,10 +132,13 @@ export const deletePost = asyncHandler(async(req:Request,res:Response)=>{
     
     post.isDeleted=true
     await post.save()
-    const posts=await User.find({userId:userId,isBlocked:false,isDeleted:false}).populate({
-        path:userId,
-        select:'userName  profileImageUrl'
-    }).sort({date:-1})
+    const posts = await Post.find({userId:userId, isBlocked: false, isDeleted:false  }).populate({
+      path: 'userId',
+      select: 'userName profileImageUrl'
+    }).sort({date:-1});
+
+    console.log(posts);
+    
 
     res.status(200).json({ posts });
 
@@ -165,7 +168,7 @@ export const likePost = asyncHandler(async (req: Request, res: Response) => {
         message: 'liked your post',
         link: `/visit-profile/posts/${post.userId}`,
         read: false,
-        postId: postId, // assuming postId is to be passed
+        postId: postId, 
       };
       await createNotification(notificationData);
       await Post.findOneAndUpdate({ _id: postId }, { $push: { likes: userId } }, { new: true });
@@ -192,7 +195,10 @@ export const likePost = asyncHandler(async (req: Request, res: Response) => {
     const posts = await Post.find({userId:id, isBlocked: false, isDeleted:false  }).populate({
       path: 'userId',
       select: 'userName profileImageUrl'
-    }).sort({date:-1});
+    }).populate({
+      path: 'likes',
+      select: 'userName profileImageUrl'
+  }).sort({date:-1});
   
     if (posts.length==0) {  
       res.status(400);
@@ -238,3 +244,92 @@ export const likePost = asyncHandler(async (req: Request, res: Response) => {
 
 
   })
+
+  // export const savePost=asyncHandler(async(req:Request,res:Response)=>{
+
+  //   const {postId,userId}=req.body
+  //   console.log(req.body);
+    
+
+  //   const user=await User.findById(userId)
+  //   if(!user){
+  //    res.status(404)
+  //    throw new Error('user not found')
+  //   }
+
+
+  //   if(postId){
+  //     const isSavedPosts = user.savedPosts.includes(postId);
+
+  //     if(isSavedPosts){
+  //       await User.findOneAndUpdate(
+  //         {_id:userId},
+  //         {$pull:{isSavedPosts:postId}},
+  //         {new:true}
+          
+  //       );
+
+
+  //       }
+  //       else{
+  //         await User.findOneAndUpdate(
+  //           {_id:userId},
+  //           {$push:{isSavedPosts:postId}},
+  //           {new:true}
+  //         )
+  //       }
+  //     }
+      
+  //     const isSavedPost = user.savedPosts.includes(postId);
+  //     if(isSavedPost){
+  //       res.status(200).json({message:'post saved'})
+  //     }
+
+  //     const updateUser=await User.findOne({_id:userId})
+  //     res.status(201).json({user:updateUser})
+  // })
+
+
+  export const savePost = asyncHandler(async (req: Request, res: Response) => {
+    const { postId, userId } = req.body;
+    console.log("Request body:", req.body); // Debugging line
+  
+    const user = await User.findById(userId);
+    if (!user) {
+      res.status(404);
+      throw new Error('User not found');
+    }
+    let message;
+    if (postId) {
+      const isSavedPosts = user.savedPosts.includes(postId);
+      
+
+      if (isSavedPosts) {
+        await User.findOneAndUpdate(
+          { _id: userId },
+          { $pull: { savedPosts: postId } }, // Fixed field name
+          { new: true }
+        );
+
+        message = 'Post Unsaved'
+
+      } else {
+        await User.findOneAndUpdate(
+          { _id: userId },
+          { $push: { savedPosts: postId } }, // Fixed field name
+          { new: true }
+        );
+        message = 'Post Saved '
+      }
+    }
+  
+    
+
+  
+    const updateUser = await User.findOne({ _id: userId });
+    res.status(201).json({message :message , user: updateUser });
+  });
+  
+
+ 
+  

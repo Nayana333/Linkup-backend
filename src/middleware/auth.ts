@@ -18,6 +18,7 @@ const protect = asyncHandler(async (req: RequestWithToken, res: Response, next: 
             const decoded: any = jwt.verify(token, process.env.JWT_SECRET as string);
 
             if (decoded.role !== "user") {
+                
                 res.status(401);
                 throw new Error("Not authorized");
             }

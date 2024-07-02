@@ -8,6 +8,13 @@ import { log } from 'console';
 import Report from '../model/reports/reportModel'
 import Post from '../model/post/postModel'
 import mongoose from 'mongoose';
+import Job from '../model/jobs/jobModel';
+import { IJob } from "../model/jobs/jobType";
+
+
+
+
+
 
 export const adminLogin = asyncHandler(async (req: Request, res: Response) => {
     const { email, password } = req.body;
@@ -158,7 +165,7 @@ export const postList = asyncHandler(async (req: Request, res: Response) => {
     select: 'email userName'
   }).skip(skip).limit(limit);
 
-  console.log(posts); // Debugging: Log the posts to inspect
+ // Debugging: Log the posts to inspect
 
   if (posts && posts.length > 0) {
     res.status(200).json({ posts, totalPages });
@@ -185,5 +192,72 @@ export const postBlock = asyncHandler(async (req: Request, res: Response) => {
   await post.save();
 
   const blocked = post.isBlocked ? "Blocked" : "Unblocked";
+  res.status(200).json({ message: `this post has been  ${blocked} now` });
+});
+
+
+
+export const adminListJob=asyncHandler(async(req:Request,res:Response)=>{
+  try{
+  const {userId}=req.body
+  const page:number=parseInt(req.query.page as string,10) || 1
+  const limit:number=6;
+  const skip:number=(page-1) * limit
+  const totalJobs:number=await Job.countDocuments({userId,isDeleted:{$ne:true}})
+
+  const totalPages:number=Math.ceil(totalJobs/limit)
+  const jobs:IJob[]=await Job.find({userId,isDeleted:{$ne:true}}).populate({
+    path:'userId',
+    select:'userName profileImageUrl'
+  }).skip(skip).limit(limit).exec()
+  res.status(200).json({ jobs, totalPages });
+}catch(error){
+  console.log('Error occured in listing job',error);
+  res.status(500).json({ message: 'Internal server error' });
+}
+
+})
+
+export const jobList = asyncHandler(async (req: Request, res: Response) => {
+  console.log('job list');
+  
+  const page: number = parseInt(req.query.page as string, 10) || 1;
+  const limit: number = 6;
+  const skip: number = (page - 1) * limit;
+
+  const totalUsers: number = await User.countDocuments({});
+  const totalPages: number = Math.ceil(totalUsers / limit);
+
+  const jobs = await Job.find({}).populate({
+    path: 'userId',
+    select: 'email userName'
+  }).skip(skip).limit(limit);
+
+  console.log(jobs); // Debugging: Log the posts to inspect
+
+  if (jobs && jobs.length > 0) {
+    res.status(200).json({ jobs, totalPages });
+  } else {
+    res.status(400).json({ message: 'Posts not found' });
+  }
+});
+
+
+export const adminJobBlock  = asyncHandler(async (req: Request, res: Response) => {
+  const { jobId } = req.body;
+  console.log(req.body);
+
+
+  const jobs= await Job.findById(jobId);
+
+  if (!jobs) {
+    res.status(400);
+    throw new Error('post not found');
+  }
+
+  jobs.isBlocked = !jobs.isBlocked;
+  await jobs.save();
+
+  const blocked = jobs.isBlocked ? "Blocked" : "Unblocked";
   res.status(200).json({ message: `this post has been  ${blocked} now` });
 });

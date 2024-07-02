@@ -231,3 +231,25 @@ export const addJob =  asyncHandler(async (req: Request, res: Response): Promise
     }
   };
   
+  export const viewJob = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+    console.log(req.body);
+    
+    try {
+      const { jobId } = req.body;
+      const job = await Job.findOne({ _id: jobId, isDeleted: { $ne: true } })
+        .populate({
+          path: 'userId',
+          select: 'userName profileImageUrl',
+        })
+        .exec();
+  
+      if (!job) {
+         res.status(404).json({ message: 'Job details not found' });
+      }
+  
+      res.status(200).json({ job });
+    } catch (error: any) {  // Properly type the error as `any`
+      res.status(500).json({ message: 'An error occurred', error: error.message });
+    }
+  });
+  

@@ -18,6 +18,7 @@ export const getAllPostComment=asyncHandler(async(req:Request,res:Response)=>{
         path: 'replyComments.userId',
         select: 'userName profileImageUrl',
       })
+     
     res.status(200).json({comments})
 })
 
@@ -56,6 +57,7 @@ export const addComment=asyncHandler(async(req:Request,res:Response)=>{
         path: 'replyComments.userId',
         select: 'userName profileImageUrl',
       })
+      
     res.status(200).json({ message: 'Comment added successfully', comments });
 })
 
@@ -86,6 +88,7 @@ export const replyComment=asyncHandler(async(req,res)=>{
         path: 'replyComments.userId',
         select: 'userName profileImageUrl',
       })
+      
       
       console.log(comments,"dscasDasdqdqws");
       
