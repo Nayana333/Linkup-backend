@@ -12,7 +12,7 @@ router.post('/reportPostBlock',protectAdmin,reportPostBlock)
 router.get('/adminPostList',protectAdmin,postList)
 router.post('/postBlock',protectAdmin,postBlock)
 router.get('/adminJobList',protectAdmin,jobList)
-router.post('/adminJobBlock ',protectAdmin,adminJobBlock)
+router.post('/adminJobBlock',protectAdmin,adminJobBlock)
 
 
 

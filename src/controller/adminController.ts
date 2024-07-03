@@ -245,8 +245,7 @@ export const jobList = asyncHandler(async (req: Request, res: Response) => {
 
 export const adminJobBlock  = asyncHandler(async (req: Request, res: Response) => {
   const { jobId } = req.body;
-  console.log(req.body);
-
+  console.log(req.body,"raju");
 
   const jobs= await Job.findById(jobId);
 
@@ -255,9 +254,9 @@ export const adminJobBlock  = asyncHandler(async (req: Request, res: Response) =
     throw new Error('post not found');
   }
 
-  jobs.isBlocked = !jobs.isBlocked;
+  jobs.isAdminBlocked = !jobs.isAdminBlocked;
   await jobs.save();
 
-  const blocked = jobs.isBlocked ? "Blocked" : "Unblocked";
+  const blocked = jobs.isAdminBlocked ? "Blocked" : "Unblocked";
   res.status(200).json({ message: `this post has been  ${blocked} now` });
 });
