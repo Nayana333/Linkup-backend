@@ -8,6 +8,7 @@ import { createNotification } from '\../utils/notificationSetter';
 import Report from '../model/reports/reportModel'
 import { log } from "console";
 import { start } from "repl";
+import Job from "../model/jobs/jobModel";
 
 
 export const addPost = asyncHandler(async (req: Request, res: Response) => {
@@ -329,6 +330,35 @@ export const likePost = asyncHandler(async (req: Request, res: Response) => {
     const updateUser = await User.findOne({ _id: userId });
     res.status(201).json({message :message , user: updateUser });
   });
+  
+
+  export const getSavedPost = asyncHandler(
+    async (req: Request, res: Response) => {
+      const id = req.params.userId;
+      
+      
+
+      const user = await User.findOne(
+        { _id: id, isBlocked: false },
+        { savedPosts: 1,savedJobs:1, _id: 0 }
+      );
+      if (user) {
+        const savedPostIds = user.savedPosts;
+        const posts = await Post.find({ _id: { $in: savedPostIds } }).populate(
+          "userId"
+        );
+        const savedJobIds = user.savedJobs;
+        const jobs = await Job.find({ _id: { $in: savedJobIds } }).populate(
+          "userId"
+        );
+  
+        res.status(200).json({posts,jobs});
+      } else {
+        res.status(400);
+        throw new Error("User Not Found");
+      }
+    }
+  );
   
 
  

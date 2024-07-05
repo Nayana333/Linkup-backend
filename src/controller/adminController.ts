@@ -233,8 +233,8 @@ export const jobList = asyncHandler(async (req: Request, res: Response) => {
     select: 'email userName'
   }).skip(skip).limit(limit);
 
-  console.log(jobs); // Debugging: Log the posts to inspect
-
+  console.log(jobs);
+  
   if (jobs && jobs.length > 0) {
     res.status(200).json({ jobs, totalPages });
   } else {

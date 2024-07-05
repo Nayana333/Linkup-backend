@@ -84,13 +84,22 @@ export const addJob =  asyncHandler(async (req: Request, res: Response): Promise
   export const listJob = async (req: Request, res: Response): Promise<void> => {
     try {
       const { userId, filterData } = req.body;
-      const searchText = filterData?.search || '';
+      const searchText = filterData?.search || ''; 
+  
+  
+  
+      // const userApplications: mongoose.Types.ObjectId[] = await JobApplication.find({
+      //   applicantId: userId,
+      //   isDeleted: { $ne: true },
+      
+      // }).distinct('jobId');
   
       const filterCriteria: any = {
         isDeleted: { $ne: true },
         userId: { $ne: userId },
         isAdminBlocked: false,
-        isBlocked: false,
+        isBlocked:false,
+        // _id: { $nin: userApplications },
       };
   
       if (filterData) {
@@ -104,24 +113,24 @@ export const addJob =  asyncHandler(async (req: Request, res: Response): Promise
           filterCriteria.jobType = filterData.jobType;
         }
         if (filterData.salaryRange && filterData.salaryRange != 0) {
+        
+  
           const maxSalary = parseFloat(filterData.salaryRange);
           filterCriteria.salary = { $lte: maxSalary };
         }
         if (filterData.experienceRange && filterData.experienceRange != 0) {
+          
           const maxExp = parseFloat(filterData.experienceRange);
           filterCriteria.experience = { $lte: maxExp };
         }
-        if (searchText.trim() !== '' && searchText !== null) {
+  
+        if (searchText.trim() !== ''&& searchText!==null) {
           filterCriteria.jobRole = { $regex: searchText.trim(), $options: 'i' };
         }
       }
   
-      console.log('Filter Criteria:', filterCriteria);
-  
-      const jobs = await Job.find(filterCriteria)
-        .populate({ path: 'userId', select: 'userName profileImageUrl' });
-  
-      console.log('Fetched Jobs:', jobs);
+      const jobs: IJob[] = await Job.find(filterCriteria)
+        .populate({ path: 'userId', select: 'username profileImageUrl' });
   
       res.status(200).json({ jobs });
     } catch (error) {
@@ -232,9 +241,11 @@ export const addJob =  asyncHandler(async (req: Request, res: Response): Promise
   };
   
   export const viewJob = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-    console.log(req.body);
+    
     
     try {
+      console.log(req.body);
+      
       const { jobId } = req.body;
       const job = await Job.findOne({ _id: jobId, isDeleted: { $ne: true } })
         .populate({
@@ -248,7 +259,7 @@ export const addJob =  asyncHandler(async (req: Request, res: Response): Promise
       }
   
       res.status(200).json({ job });
-    } catch (error: any) {  // Properly type the error as `any`
+    } catch (error: any) {  
       res.status(500).json({ message: 'An error occurred', error: error.message });
     }
   });

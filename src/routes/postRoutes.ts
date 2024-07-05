@@ -1,6 +1,6 @@
 import express from 'express'
 const router=express.Router()
-import { addPost,getPost ,deletePost,editPost,likePost,getUserPost,reportPost,savePost} from '../controller/postController'
+import { addPost,getPost ,deletePost,editPost,likePost,getUserPost,reportPost,savePost,getSavedPost} from '../controller/postController'
 import{getAllPostComment,addComment,replyComment, deleteComment} from '../controller/commentController'
 import { protect } from '../middleware/auth';
 
@@ -16,5 +16,6 @@ router.post('/getUserPost',protect,getUserPost)
 router.get('/deleteComment',protect,deleteComment)
 router.post('/reportPost',protect,reportPost)
 router.post('/savePost',protect,savePost)
+router.get('/getSavedPost/:userId',getSavedPost)
 
 export default router
