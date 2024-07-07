@@ -1,5 +1,5 @@
 import express from "express";
-import { registerUser,verifyOTP,resendOTP,login,forgotPsw,forgotOtp,resetPsw,googleAuth,setPreferences,basicInformation,setUserRole} from '../controller/userController';
+import { registerUser,verifyOTP,resendOTP,login,forgotPsw,forgotOtp,resetPsw,googleAuth,setPreferences,basicInformation,setUserRole,userSuggestions} from '../controller/userController';
 import { protect } from '../middleware/auth'
 const router = express.Router();
 
@@ -14,6 +14,6 @@ router.post('/googleAuth',googleAuth)
 router.post('/setPreferences',setPreferences)
 router.post('/basicInformation',basicInformation)
 router.put('/setUserRole',protect,setUserRole)
-
+router.post('/userSuggestions',protect,userSuggestions)
 export default router;
 
