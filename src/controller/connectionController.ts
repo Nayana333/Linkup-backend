@@ -37,7 +37,7 @@ export const cancelRequest=asyncHandler(async(req:Request,res:Response)=>{
 
     const connection=await Connections.findOne({userId}).populate('connections').populate('requested').populate('requestSent')
 
-    res.status(200).json({success:true,message:'follow request cancelled successfully'})
+    res.status(200).json({success:true,message:'follow request cancelled successfully',connection})
 })
 
 
@@ -153,7 +153,7 @@ export const followUser = asyncHandler(async (req: Request, res: Response) => {
       .populate('requestSent');
   
   
-      res.status(200).json({ connection: connection });
+      res.status(200).json({ connection: connection  });
       
     }
   );

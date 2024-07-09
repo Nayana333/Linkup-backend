@@ -10,6 +10,7 @@ import  errorHandler from './middleware/errorHandler'
 import adminRoute from "./routes/adminRoute"
 import postRoutes from './routes/postRoutes'
 import jobRoutes from './routes/jobRoute'
+import connectionRoutes from './routes/connectionRoutes'
 
 dotenv.config();
 
@@ -57,6 +58,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/admin',adminRoute);
 app.use('/api/post',postRoutes)
 app.use('/api/job',jobRoutes)
+app.use('/api/connect',connectionRoutes)
 
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))

@@ -10,3 +10,4 @@ router.post('/follow',protect,followUser)
 router.post('/rejectRequest',protect,rejectRequest)
 router.post('/getConnection',protect,getConnection)
 
+export default router

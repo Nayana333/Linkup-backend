@@ -439,4 +439,25 @@ res.status(200).json({suggestedUsers})
 
 
 
+export const getUserDetails=asyncHandler(async(req:Request,res:Response)=>{
 
+  try{
+
+    const {userId}=req.params
+
+    const user=await User.findById(userId).populate('profile').populate('companyProfile')
+
+    const connections=await Connections.findOne({userId:userId})
+
+    if(user){
+      res.status(200).json({user,connections})
+    }
+    else{
+      res.status(400).json({message:'user not found'})
+    }
+  }catch(error:any){
+    console.log(error);
+    
+  }
+
+})
