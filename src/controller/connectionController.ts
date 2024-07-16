@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import Connections from "../model/connection/connectionModel";
 import { createNotification } from "../utils/notificationSetter";
 import User from "../model/user/userModel";
+import { log } from "console";
 
 
 export const acceptRequest=asyncHandler(async(req:Request,res:Response)=>{
@@ -32,11 +33,11 @@ export const acceptRequest=asyncHandler(async(req:Request,res:Response)=>{
 
 export const cancelRequest=asyncHandler(async(req:Request,res:Response)=>{
     const {userId,cancellingUser}=req.body
+    
 
-    await Connections.findOneAndUpdate({userId},{$pull:{requested:userId}})
+    await Connections.findOneAndUpdate({userId},{$pull:{requestSent:cancellingUser}})
 
     const connection=await Connections.findOne({userId}).populate('connections').populate('requested').populate('requestSent')
-
     res.status(200).json({success:true,message:'follow request cancelled successfully',connection})
 })
 

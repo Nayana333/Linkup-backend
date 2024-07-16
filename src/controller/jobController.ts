@@ -2,6 +2,7 @@ import Job from "../model/jobs/jobModel";
 import { IJob } from "../model/jobs/jobType";
 import asyncHandler from "express-async-handler";
 import { Request, Response } from "express";
+import { log } from "console";
 
 
 
@@ -81,7 +82,68 @@ export const addJob =  asyncHandler(async (req: Request, res: Response): Promise
 
 
   
-  export const listJob = async (req: Request, res: Response): Promise<void> => {
+  // export const listJob = async (req: Request, res: Response): Promise<void> => {
+  //   try {
+  //     const { userId, filterData } = req.body;
+  //     const searchText = filterData?.search || ''; 
+  
+  
+  
+  //     // const userApplications: mongoose.Types.ObjectId[] = await JobApplication.find({
+  //     //   applicantId: userId,
+  //     //   isDeleted: { $ne: true },
+      
+  //     // }).distinct('jobId');
+  
+  //     const filterCriteria: any = {
+  //       isDeleted: { $ne: true },
+  //       userId: { $ne: userId },
+  //       isAdminBlocked: false,
+  //       isBlocked:false,
+  //       // _id: { $nin: userApplications },
+  //     };
+  
+  //     if (filterData) {
+  //       if (filterData.jobRole) {
+  //         filterCriteria.jobRole = filterData.jobRole;
+  //       }
+  //       if (filterData.location) {
+  //         filterCriteria.jobLocation = filterData.location;
+  //       }
+  //       if (filterData.jobType) {
+  //         filterCriteria.jobType = filterData.jobType;
+  //       }
+  //       if (filterData.salaryRange && filterData.salaryRange != 0) {
+        
+  
+  //         const maxSalary = parseFloat(filterData.salaryRange);
+  //         filterCriteria.salary = { $lte: maxSalary };
+  //       }
+  //       if (filterData.experienceRange && filterData.experienceRange != 0) {
+          
+  //         const maxExp = parseFloat(filterData.experienceRange);
+  //         filterCriteria.experience = { $lte: maxExp };
+  //       }
+  
+  //       if (searchText.trim() !== ''&& searchText!==null) {
+  //         filterCriteria.jobRole = { $regex: searchText.trim(), $options: 'i' };
+  //       }
+  //     }
+  
+  //     const jobs: IJob[] = await Job.find(filterCriteria)
+  //       .populate({ path: 'userId', select: 'username profileImageUrl' });
+  
+  //     res.status(200).json({ jobs });
+  //   } catch (error) {
+  //     console.error('Error listing active jobs:', error);
+  //     res.status(500).json({ message: 'Internal server error' });
+  //   }
+  // };
+
+
+
+
+  export const listJob= async (req: Request, res: Response): Promise<void> => {
     try {
       const { userId, filterData } = req.body;
       const searchText = filterData?.search || ''; 
@@ -263,4 +325,18 @@ export const addJob =  asyncHandler(async (req: Request, res: Response): Promise
       res.status(500).json({ message: 'An error occurred', error: error.message });
     }
   });
+  
+
+  export const getFormSelectData = async (req: Request, res: Response): Promise<void> => {
+    try {
+      
+      const distinctLocations= await Job.distinct('jobLocation').sort();
+      const distinctRoles = await Job.distinct('jobRole').sort();
+  
+      res.status(200).json({ locations: distinctLocations, roles: distinctRoles });
+    } catch (error) {
+      console.error('Error fetching distinct job data:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  };
   

@@ -95,7 +95,6 @@ export const getPost = asyncHandler(async (req: Request, res: Response) => {
                   post.hideComment = hideComment;
               }
   
-              // Set isEdited to true
               post.isEdited = true;
   
               await post.save();
@@ -246,91 +245,72 @@ export const likePost = asyncHandler(async (req: Request, res: Response) => {
 
   })
 
-  // export const savePost=asyncHandler(async(req:Request,res:Response)=>{
-
-  //   const {postId,userId}=req.body
-  //   console.log(req.body);
-    
-
-  //   const user=await User.findById(userId)
-  //   if(!user){
-  //    res.status(404)
-  //    throw new Error('user not found')
-  //   }
+ 
 
 
-  //   if(postId){
-  //     const isSavedPosts = user.savedPosts.includes(postId);
-
-  //     if(isSavedPosts){
-  //       await User.findOneAndUpdate(
-  //         {_id:userId},
-  //         {$pull:{isSavedPosts:postId}},
-  //         {new:true}
-          
-  //       );
-
-
-  //       }
-  //       else{
-  //         await User.findOneAndUpdate(
-  //           {_id:userId},
-  //           {$push:{isSavedPosts:postId}},
-  //           {new:true}
-  //         )
-  //       }
-  //     }
-      
-  //     const isSavedPost = user.savedPosts.includes(postId);
-  //     if(isSavedPost){
-  //       res.status(200).json({message:'post saved'})
-  //     }
-
-  //     const updateUser=await User.findOne({_id:userId})
-  //     res.status(201).json({user:updateUser})
-  // })
-
-
-  export const savePost = asyncHandler(async (req: Request, res: Response) => {
-    const { postId, userId } = req.body;
-    console.log("Request body:", req.body); // Debugging line
   
+  export const savePost = asyncHandler(async (req: Request, res: Response) => {
+    const { postId, userId, jobId } = req.body;
+    console.log("Request body:", req.body);
+
     const user = await User.findById(userId);
     if (!user) {
-      res.status(404);
-      throw new Error('User not found');
+        res.status(404);
+        throw new Error('User not found');
     }
+
     let message;
+
     if (postId) {
-      const isSavedPosts = user.savedPosts.includes(postId);
-      
+        const isSavedPosts = user.savedPosts.includes(postId);
 
-      if (isSavedPosts) {
-        await User.findOneAndUpdate(
-          { _id: userId },
-          { $pull: { savedPosts: postId } }, // Fixed field name
-          { new: true }
-        );
-
-        message = 'Post Unsaved'
-
-      } else {
-        await User.findOneAndUpdate(
-          { _id: userId },
-          { $push: { savedPosts: postId } }, // Fixed field name
-          { new: true }
-        );
-        message = 'Post Saved '
-      }
+        if (isSavedPosts) {
+            await User.findOneAndUpdate(
+                { _id: userId },
+                { $pull: { savedPosts: postId } },
+                { new: true }
+            );
+            message = 'Post Unsaved';
+        } else {
+            await User.findOneAndUpdate(
+                { _id: userId },
+                { $push: { savedPosts: postId } },
+                { new: true }
+            );
+            message = 'Post Saved';
+        }
     }
-  
-    
 
-  
+    if (jobId) {
+        const isSavedJobs = user.savedJobs.includes(jobId);
+
+        if (isSavedJobs) {
+            await User.findOneAndUpdate(
+                { _id: userId },
+                { $pull: { savedJobs: jobId } },
+                { new: true }
+            );
+            message = 'Job Unsaved';
+        } else {
+            await User.findOneAndUpdate(
+                { _id: userId },
+                { $push: { savedJobs: jobId } },
+                { new: true }
+            );
+            message = 'Job Saved';
+        }
+    }
+
     const updateUser = await User.findOne({ _id: userId });
-    res.status(201).json({message :message , user: updateUser });
-  });
-  
+    res.status(201).json({ message: message, user: updateUser });
+});
+
+
+
+
+
+
+
 
   export const getSavedPost = asyncHandler(
     async (req: Request, res: Response) => {
