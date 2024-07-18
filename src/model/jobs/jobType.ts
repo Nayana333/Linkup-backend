@@ -1,7 +1,10 @@
 import mongoose, { Schema, Document } from "mongoose";
 
+// Define ObjectId type for TypeScript
+type ObjectId = mongoose.Types.ObjectId;
+
 export interface IJob extends Document {
-  userId: Schema.Types.ObjectId;
+  userId: ObjectId;
   companyName: string;
   jobRole?: string;
   experience: number;
@@ -13,6 +16,7 @@ export interface IJob extends Document {
   jobDescription?: string;
   qualification?: string;
   isDeleted: boolean;
-  isBlocked:boolean;
-  isAdminBlocked:boolean;
+  isBlocked: boolean;
+  isAdminBlocked: boolean;
+  applicants: ObjectId[];
 }

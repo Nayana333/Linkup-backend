@@ -3,6 +3,10 @@ import { IJob } from "../model/jobs/jobType";
 import asyncHandler from "express-async-handler";
 import { Request, Response } from "express";
 import { log } from "console";
+import path from "path";
+import  JobApplication from '../model/jobApplication/jobApplicationModel'
+import { createNotification } from "../utils/notificationSetter";
+import User from "../model/user/userModel";
 
 
 
@@ -339,4 +343,115 @@ export const addJob =  asyncHandler(async (req: Request, res: Response): Promise
       res.status(500).json({ message: 'Internal server error' });
     }
   };
+  
+  export const addJobApplication = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const {
+        applicantId,
+        jobId,
+        applicationStatus,
+        coverLetter
+                  } = req.body;
+  
+      const resumePath = req.file?.path;
+      const resumeName = resumePath ? path.basename(resumePath) : null;
+  
+      if (!resumeName) {
+        res.status(400).json({ message: 'No resume uploaded' });
+        return;
+      }
+  
+      const newJobApplication = new JobApplication({
+        applicantId,
+        jobId,
+        applicationStatus,
+        coverLetter,
+        resume: resumeName
+      });
+      await newJobApplication.save();
+  
+      const job = await Job.findOne({ _id: jobId });
+  
+      if (job) {
+        const notificationData = {
+          senderId: applicantId,
+          receiverId: job.userId,
+          message: `applied for the position of ${job.jobRole} at ${job.companyName}`,
+          link: `/visit-profile/posts/`,
+          read: false,
+          jobId: jobId
+        };
+  
+        createNotification(notificationData);
+      }
+  
+      await User.updateOne({ _id: applicantId }, { $inc: { dailyJobsApplied: 1 } });
+      const user = await User.findOne({ _id: applicantId });
+  
+      res.status(201).json({ message: 'Job application submitted', jobApplication: newJobApplication, user ,job});
+  
+    } catch (error) {
+      console.error('Error adding job application:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  };
+
+
+
+  export const cancelJobApplications = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { applicationId ,applicantId} = req.body; 
+      const jobApplication = await JobApplication.findById(applicationId);
+  
+      if (!jobApplication) {
+        res.status(404).json({ message: 'Job application not found' });
+        return;
+      }
+      jobApplication.isDeleted = !jobApplication.isDeleted;
+  
+      await jobApplication.save();
+  
+      const applications = await JobApplication.find({ applicantId ,
+        isDeleted: { $ne: true}}) .populate('applicantId').populate('jobId')
+        .exec();
+  
+      res.status(200).json({ success: true,message:"Application Canceled", applications });
+    } catch (error) {
+      console.error('Error fetching employee applications:', error);
+      res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+  };
+  
+  export const getEmployeeApplications=asyncHandler(async(req:Request,res:Response)=>{
+    try{    
+      const {applicantId}=req.body;
+      const applications=await JobApplication.find({applicantId,isDeleted:{$ne:true}}).populate('applicantId').populate('jobId').exec()
+      
+      res.status(200).json({success:true,applications})
+
+    }catch(error){
+      console.log(error);
+      
+    }
+  })
+
+
+  export const employerApplications=async(req:Request,res:Response):Promise<void>=>{
+    try{
+      const {userId}=req.body
+
+      const jobs=await Job.find({userId})
+      const jobIds = jobs.map((job) => job._id);
+      const applications = await JobApplication.find({ jobId: { $in: jobIds } }) .populate('applicantId').populate('jobId')
+        .exec();
+        res.status(200).json({ success: true, applications });
+
+    }catch(error){
+      console.log('error fetching employer applications:',error);
+      res.status(500).json({ success: false, message: 'Internal server error' });
+
+    }
+  }
+
+
   
