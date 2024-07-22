@@ -11,6 +11,10 @@ import adminRoute from "./routes/adminRoute"
 import postRoutes from './routes/postRoutes'
 import jobRoutes from './routes/jobRoute'
 import connectionRoutes from './routes/connectionRoutes'
+import chatRoute from './routes/chatRoute'
+import { Server, Socket } from 'socket.io';
+import socketIo_Config from './utils/socket/socket';
+
 
 dotenv.config();
 
@@ -18,6 +22,14 @@ const app: Express = express();
 const PORT = process.env.PORT || 3000;
 const server = http.createServer(app);
 app.use(express.json());
+
+const io: Server = new Server(server, {
+  cors: { origin: '*' }
+});
+socketIo_Config(io);
+
+
+app.use(express.static(path.join(__dirname, 'public')));
 
 //session
 declare module 'express-session' {
@@ -59,6 +71,7 @@ app.use('/api/admin',adminRoute);
 app.use('/api/post',postRoutes)
 app.use('/api/job',jobRoutes)
 app.use('/api/connect',connectionRoutes)
+app.use('/api/chat',chatRoute)
 
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))

@@ -1,5 +1,5 @@
 import express from "express";
-import { addJob, listUserJob, listJob, userJobBlock, editJob, getJobDetails, viewJob, getFormSelectData, addJobApplication, cancelJobApplications, getEmployeeApplications ,employerApplications} from '../controller/jobController';
+import { addJob, listUserJob, listJob, userJobBlock, editJob, getJobDetails, viewJob, getFormSelectData, addJobApplication, cancelJobApplications, getEmployeeApplications ,employerApplications,updateApplicationStatus} from '../controller/jobController';
 import { Request, Response, NextFunction } from 'express';
 import multer, { Multer } from 'multer'; 
 import path from 'path';
@@ -44,5 +44,6 @@ router.post('/apply-job', upload.single('resume'), addJobApplication);
 router.patch('/cancelJobApplication',protect,cancelJobApplications)
 router.post('/getEmployeeApplications',protect,getEmployeeApplications)
 router.post('/employerApplications',protect,employerApplications)
+router.patch('/updateApplicationStatus',protect,updateApplicationStatus)
 
 export default router;

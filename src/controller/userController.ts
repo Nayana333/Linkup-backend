@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import asyncHandler from 'express-async-handler';
 import User from "../model/user/userModel";
+import Post from "../model/post/postModel";
+import Job from "../model/jobs/jobModel";
 import { UserType } from "../model/user/userType";
 const speakeasy = require('speakeasy');
 import bcrypt from "bcryptjs";
@@ -9,6 +11,7 @@ import generateToken from "../utils/generateToken";
 import generateRefreshToken from "../utils/generateRefreshToken";
 import { Connection } from "mongoose";
 import Connections from "../model/connection/connectionModel";
+import { log } from "console";
 
 
 export const registerUser = asyncHandler(async (req: Request, res: Response) => {
@@ -315,7 +318,6 @@ export const setPreferences = async (req: Request, res: Response) => {
     console.log(req.body);
     
     
-    // The filter parameter for findOne should be an object
     const user = await User.findOne({ _id: userId });
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -461,3 +463,87 @@ export const getUserDetails=asyncHandler(async(req:Request,res:Response)=>{
   }
 
 })
+
+
+
+// export const searchAllCollections = asyncHandler(async (req, res) => {
+//   try {
+//     const fullData=await Job.find({})
+//     console.log(fullData);
+    
+   
+//     console.log();
+    
+//     const searchQuery = req.query.searchQuery;
+ 
+//     const users = await User.find({
+//       $or: [
+//         { userName: { $regex: searchQuery, $options: 'i' } },
+//         { email: { $regex: searchQuery, $options: 'i' } }
+//       ]
+//     });
+
+//     const posts = await Post.find({
+//       $or: [
+//         { title: { $regex: searchQuery, $options: 'i' } },
+//         { description: { $regex: searchQuery, $options: 'i' } }
+//       ]
+//     }).populate('userId');
+
+//     const jobs = await Job.find({
+//       $or: [
+//         { companyName: { $regex: searchQuery, $options: 'i' } },
+//         { jobRole: { $regex: searchQuery, $options: 'i' } },
+//         { jobLocation: { $regex: searchQuery, $options: 'i' } },
+//         { requiredSkills: { $regex: searchQuery, $options: 'i' } },
+//         { jobDescription: { $regex: searchQuery, $options: 'i' } },
+//         { qualification: { $regex: searchQuery, $options: 'i' } },
+//       ],
+//     });
+
+//     res.status(200).json({ users, posts, jobs });
+    
+    
+//   } catch (error) {
+//     console.log('Error searching collections:', error);
+//     res.status(500).json({ message: 'Internal server error' });
+//   }
+// });
+
+export const searchAllCollections = asyncHandler(async (req, res) => {
+  try {
+    const searchQuery = req.query.searchQuery;
+
+    const regex = new RegExp(`\\b${searchQuery}\\b`, 'i'); // Word boundary regex
+
+    const users = await User.find({
+      $or: [
+        { userName: { $regex: regex } },
+        { email: { $regex: regex } }
+      ]
+    });
+
+    const posts = await Post.find({
+      $or: [
+        { title: { $regex: regex } },
+        { description: { $regex: regex } }
+      ]
+    }).populate('userId');
+
+    const jobs = await Job.find({
+      $or: [
+        { companyName: { $regex: regex } },
+        { jobRole: { $regex: regex } },
+        { jobLocation: { $regex: regex } },
+        { requiredSkills: { $regex: regex } },
+        { jobDescription: { $regex: regex } },
+        { qualification: { $regex: regex } },
+      ],
+    });
+
+    res.status(200).json({ users, posts, jobs });
+  } catch (error) {
+    console.log('Error searching collections:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
