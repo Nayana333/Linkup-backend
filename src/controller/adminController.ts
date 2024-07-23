@@ -84,6 +84,8 @@ export const adminLogin = asyncHandler(async (req: Request, res: Response) => {
   
 
   export const reportList= asyncHandler(async (req: Request, res: Response) => {
+    console.log('asdasds');
+    
     const page: number = parseInt(req.query.page as string, 10) || 1;
     const limit = 6;
     const skip = (page - 1) * limit;
@@ -105,6 +107,8 @@ export const adminLogin = asyncHandler(async (req: Request, res: Response) => {
         })
         .skip(skip)
         .limit(limit);
+        console.log(report);
+        
 
     if (report.length > 0) {
         res.status(200).json({ report, totalPages });

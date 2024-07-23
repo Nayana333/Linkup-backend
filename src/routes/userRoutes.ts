@@ -1,5 +1,5 @@
 import express from "express";
-import { registerUser,verifyOTP,resendOTP,login,forgotPsw,forgotOtp,resetPsw,googleAuth,setPreferences,basicInformation,setUserRole,userSuggestions,getUserDetails,searchAllCollections} from '../controller/userController';
+import { registerUser,verifyOTP,resendOTP,login,forgotPsw,forgotOtp,resetPsw,googleAuth,setPreferences,basicInformation,setUserRole,userSuggestions,getUserDetails,searchAllCollections,getNotifications} from '../controller/userController';
 import { protect } from '../middleware/auth'
 const router = express.Router();
 
@@ -17,5 +17,6 @@ router.put('/setUserRole',protect,setUserRole)
 router.post('/userSuggestions',protect,userSuggestions)
 router.get('/userDeatils/:userId',protect,getUserDetails)
 router.get("/search", protect, searchAllCollections);
+router.post('/getNotifications',protect,getNotifications)
 export default router;
 

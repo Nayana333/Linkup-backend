@@ -9,7 +9,7 @@ import { log } from "console";
 
 export const addConversation = asyncHandler(
     async (req: Request, res: Response) => {
-      console.log(req.body);
+      // console.log(req.body);
       const { senderId, receiverId } = req.body;
       const existConversation = await Conversation.findOne({
         members: { $all: [senderId, receiverId] },
@@ -51,9 +51,8 @@ export const addConversation = asyncHandler(
           path: 'members',
           select: 'userName profileImageUrl'
         }).sort({updatedAt:-1});
-        console.log(conversation,'get conv');
-        console.log(getUserConversation,'dkajsdhagah');
-        
+        // console.log(conversation,'get conv');
+        // console.log(getUserConversation,'dkajsdhagah');        
         res.status(200).json(conversation);
 
       } catch (err) {
@@ -118,7 +117,7 @@ export const addConversation = asyncHandler(
     async (req: Request, res: Response) => {
       try {
         const { conversationId, userId } = req.body;
-        console.log(conversationId, userId + "Reading Messages");
+        // console.log(conversationId, userId + "Reading Messages");
         const messages = await Message.updateMany(
           { conversationId: conversationId, sender: { $ne: userId } },
           { $set: { isRead: true } }
@@ -134,13 +133,13 @@ export const addConversation = asyncHandler(
     async (req: Request, res: Response) => {
       try {
         const { conversationId, userId } = req.body;
-        console.log(conversationId, userId + "unreadMessages getting....");
+        // console.log(conversationId, userId + "unreadMessages getting....");
         const messages = await Message.find({
           conversationId: conversationId,
           sender: { $ne: userId },
           isRead: false,
         });
-        console.log(messages);
+        // console.log(messages);
         res.status(200).json(messages);
       } catch (err) {
         res.status(500).json(err);

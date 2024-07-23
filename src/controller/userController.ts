@@ -12,6 +12,9 @@ import generateRefreshToken from "../utils/generateRefreshToken";
 import { Connection } from "mongoose";
 import Connections from "../model/connection/connectionModel";
 import { log } from "console";
+import Notification from '../model/notification/notificationModel';
+import { INotification } from '../model/notification/notificationType';
+
 
 
 export const registerUser = asyncHandler(async (req: Request, res: Response) => {
@@ -547,3 +550,30 @@ export const searchAllCollections = asyncHandler(async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+
+
+interface NotificationData extends INotification {
+  senderConnections?: any[]; 
+}
+
+export const getNotifications = async (req: Request, res: Response): Promise<void> => {
+
+  try{
+    const userId=req.body.userId;
+    const connections=await Connections.findOne({userId})
+    const userConnections:any[]=connections?.connections ||[]
+
+    const notifications: NotificationData[] = await Notification.find({ receiverId: userId }).populate({
+      path: 'senderId',
+      select: 'userName profileImageUrl'
+    }).sort({createdAt:-1})
+console.log(notifications);
+
+    res.status(200).json({ notifications: notifications });
+
+  }catch(error){
+    console.error('Error fetching notifications:', error);
+    res.status(500).json({ message: 'Error fetching notifications' });
+  }
+  
+}
