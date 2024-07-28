@@ -8,6 +8,8 @@ const socketIo_Config = (io: any) => {
         console.log("A client disconnected");
       });
   
+      //on used for coming connection 
+      // emit used for giving
       const removeUser = (socketId: string) => {
         users = users.filter((user) => user.socketId !== socketId);
       };

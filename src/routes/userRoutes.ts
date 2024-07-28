@@ -11,12 +11,13 @@ router.post('/forgotPsw',forgotPsw)
 router.post('/forgotOtp',forgotOtp)
 router.put('/resetPsw',resetPsw)
 router.post('/googleAuth',googleAuth)
-router.post('/setPreferences',setPreferences)
-router.post('/basicInformation',basicInformation)
+router.post('/setPreferences',protect,setPreferences)
+router.post('/basicInformation',protect,basicInformation)
 router.put('/setUserRole',protect,setUserRole)
 router.post('/userSuggestions',protect,userSuggestions)
 router.get('/userDeatils/:userId',protect,getUserDetails)
 router.get("/search", protect, searchAllCollections);
 router.post('/getNotifications',protect,getNotifications)
+
 export default router;
 
