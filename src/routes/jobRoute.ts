@@ -1,5 +1,6 @@
 import express from "express";
-import { addJob, listUserJob, listJob, userJobBlock, editJob, getJobDetails, viewJob, getFormSelectData, addJobApplication, cancelJobApplications, getEmployeeApplications ,employerApplications,updateApplicationStatus} from '../controller/jobController';
+import { addJob, listUserJob, listJob, userJobBlock, editJob, getJobDetails, viewJob, getFormSelectData, addJobApplication, cancelJobApplications, getEmployeeApplications ,employerApplications,updateApplicationStatus,} from '../controller/jobController';
+import {addInterview, getIntervieweeInterviews,getInterviewerInterviews,setInterviewStatus} from '../controller/interviewController'
 import { Request, Response, NextFunction } from 'express';
 import multer, { Multer } from 'multer'; 
 import path from 'path';
@@ -45,5 +46,9 @@ router.patch('/cancelJobApplication',protect,cancelJobApplications)
 router.post('/getEmployeeApplications',protect,getEmployeeApplications)
 router.post('/employerApplications',protect,employerApplications)
 router.patch('/updateApplicationStatus',protect,updateApplicationStatus)
+router.post('/getIntervieweeInterviews',protect,getIntervieweeInterviews)
+router.post('/getInterviewerInterviews',protect,getInterviewerInterviews)
+router.patch('/setInterviewStatus',protect,setInterviewStatus)
+router.post('/addInterview',protect,addInterview)
 
 export default router;
