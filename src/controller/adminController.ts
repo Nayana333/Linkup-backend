@@ -291,38 +291,65 @@ try{
 })
 
 
-export const chartData=asyncHandler(async(req:Request,res:Response)=>{
+// export const chartData=asyncHandler(async(req:Request,res:Response)=>{
 
-  const userJoinStatus=await User.aggregate([
-    { $group: { _id: { $dateToString: { format: "%Y-%m", date: "$createdAt" } }, userCount: { $sum: 1 }, } },
-    {
-      $sort:{_id:1},
-    }
-  ]
+//   const userJoinStatus=await User.aggregate([
+//     { $group: { _id: { $dateToString: { format: "%Y-%m", date: "$createdAt" } }, userCount: { $sum: 1 }, } },
+//     {
+//       $sort:{_id:1},
+//     }
+//   ]
 
-  )
-  const  postCreationStats=await Post.aggregate([
-    { $group: { _id: { $dateToString: { format: "%Y-%m", date: "$createdAt" } }, userCount: { $sum: 1 }, } },
-    {
-      $sort:{_id:1},
-    }
-  ]
+//   )
+//   const  postCreationStats=await Post.aggregate([
+//     { $group: { _id: { $dateToString: { format: "%Y-%m", date: "$createdAt" } }, userCount: { $sum: 1 }, } },
+//     {
+//       $sort:{_id:1},
+//     }
+//   ]
 
-  )
-  const  jobCreationStats=await Job.aggregate([
-    { $group: { _id: { $dateToString: { format: "%Y-%m", date: "$createdAt" } }, userCount: { $sum: 1 }, } },
-    {
-      $sort:{_id:1},
-    }
-  ]
+//   )
+//   const  jobCreationStats=await Job.aggregate([
+//     { $group: { _id: { $dateToString: { format: "%Y-%m", date: "$createdAt" } }, userCount: { $sum: 1 }, } },
+//     {
+//       $sort:{_id:1},
+//     }
+//   ]
 
-  )
-  const chartData={
+//   )
+//   const chartData={
+//     jobCreationStats,
+//     postCreationStats,
+//     userJoinStatus
+//   }
+
+//   res.status(200).json({chartData})
+
+// })
+
+
+
+export const chartData = asyncHandler(async (req, res) => {
+  const userJoinStatus = await User.aggregate([
+    { $group: { _id: { $dateToString: { format: "%Y-%m", date: "$createdAt" } }, userCount: { $sum: 1 } } },
+    { $sort: { _id: 1 } }
+  ]);
+
+  const postCreationStats = await Post.aggregate([
+    { $group: { _id: { $dateToString: { format: "%Y-%m", date: "$createdAt" } }, postCount: { $sum: 1 } } },
+    { $sort: { _id: 1 } }
+  ]);
+
+  const jobCreationStats = await Job.aggregate([
+    { $group: { _id: { $dateToString: { format: "%Y-%m", date: "$createdAt" } }, jobCount: { $sum: 1 } } },
+    { $sort: { _id: 1 } }
+  ]);
+
+  const chartData = {
     jobCreationStats,
     postCreationStats,
     userJoinStatus
-  }
+  };
 
-  res.status(200).json({chartData})
-
-})
+  res.status(200).json({ chartData });
+});

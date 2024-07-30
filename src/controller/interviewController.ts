@@ -6,9 +6,6 @@ import Job from "../model/jobs/jobModel";
 import { IJob } from "../model/jobs/jobType";
 
 
-
-
-
 export const getIntervieweeInterviews=  async (req: Request, res: Response): Promise<void> =>{
     try {
       const intervieweeId = req.body.intervieweeId;
@@ -107,7 +104,7 @@ export const getIntervieweeInterviews=  async (req: Request, res: Response): Pro
       const interviewLink=randomID(10)
 
       const newInterview = new Interview({
-        
+
         interviewerId,
         intervieweeId,
         applicationId,
