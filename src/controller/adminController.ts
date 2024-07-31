@@ -10,6 +10,8 @@ import Post from '../model/post/postModel'
 import mongoose from 'mongoose';
 import Job from '../model/jobs/jobModel';
 import { IJob } from "../model/jobs/jobType";
+import Notification from '../model/notification/notificationModel';
+import { INotification } from '../model/notification/notificationType';
 
 
 
@@ -167,7 +169,7 @@ export const postList = asyncHandler(async (req: Request, res: Response) => {
   const posts = await Post.find({}).populate({
     path: 'userId',
     select: 'email userName'
-  }).skip(skip).limit(limit);
+  }).skip(skip).limit(limit).sort({ createdAt: -1 });
 
  // Debugging: Log the posts to inspect
 
@@ -291,42 +293,6 @@ try{
 })
 
 
-// export const chartData=asyncHandler(async(req:Request,res:Response)=>{
-
-//   const userJoinStatus=await User.aggregate([
-//     { $group: { _id: { $dateToString: { format: "%Y-%m", date: "$createdAt" } }, userCount: { $sum: 1 }, } },
-//     {
-//       $sort:{_id:1},
-//     }
-//   ]
-
-//   )
-//   const  postCreationStats=await Post.aggregate([
-//     { $group: { _id: { $dateToString: { format: "%Y-%m", date: "$createdAt" } }, userCount: { $sum: 1 }, } },
-//     {
-//       $sort:{_id:1},
-//     }
-//   ]
-
-//   )
-//   const  jobCreationStats=await Job.aggregate([
-//     { $group: { _id: { $dateToString: { format: "%Y-%m", date: "$createdAt" } }, userCount: { $sum: 1 }, } },
-//     {
-//       $sort:{_id:1},
-//     }
-//   ]
-
-//   )
-//   const chartData={
-//     jobCreationStats,
-//     postCreationStats,
-//     userJoinStatus
-//   }
-
-//   res.status(200).json({chartData})
-
-// })
-
 
 
 export const chartData = asyncHandler(async (req, res) => {
@@ -353,3 +319,34 @@ export const chartData = asyncHandler(async (req, res) => {
 
   res.status(200).json({ chartData });
 });
+
+interface NotificationData extends INotification {
+  senderConnections?: any[]; 
+}
+
+
+export const getAdminNotifications = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const adminId = req.body.adminId;
+
+    // Fetch the admin to ensure they exist
+    const admin = await Admin.findById(adminId);
+    if (!admin) {
+      res.status(404).json({ message: 'Admin not found' });
+      return;  // Explicitly return after sending response
+    }
+
+    // Fetch notifications intended for this admin
+    const notifications = await Notification.find({ receiverId: adminId })
+      .populate({
+        path: 'senderId',
+        select: 'userName profileImageUrl',
+      })
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({ notifications });
+  } catch (error) {
+    console.error('Error fetching notifications:', error);
+    res.status(500).json({ message: 'Error fetching notifications' });
+  }
+};
