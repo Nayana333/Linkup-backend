@@ -100,7 +100,7 @@ export const replyComment=asyncHandler(async(req,res)=>{
 
 
 export const deleteComment = asyncHandler(async (req: Request, res: Response) => {
-    const commentId = req.query.commentId as string;  // Ensure correct extraction
+    const commentId = req.query.commentId as string;   
     console.log(commentId);
    
     if (!commentId) {

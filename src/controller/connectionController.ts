@@ -19,9 +19,9 @@ export const acceptRequest=asyncHandler(async(req:Request,res:Response)=>{
         senderId:userId,
         receiverId: requestedUser ,
         message: 'accepted your request',
-        link: `/visit-profile/posts/`, 
+        link: `/people/connections/${userId}`, 
         read: false, 
-     
+
       };
 
       createNotification(notificationData)

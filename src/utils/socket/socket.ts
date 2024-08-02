@@ -1,5 +1,11 @@
 const socketIo_Config = (io: any) => {
     let users: { userId: string; socketId: string }[] = [];
+    interface SendNotificationArgs {
+      recieverId: string;
+      senderName: string;
+      message: string;
+    }
+    
   
     io.on("connect", (socket: any) => {
       console.log("A client connected");
@@ -78,6 +84,20 @@ const socketIo_Config = (io: any) => {
           }
         }
       );
+
+      socket.on(
+        'sendNotification',
+        ({ recieverId, senderName,message}: SendNotificationArgs) => {
+          console.log('notification',recieverId, senderName, message );
+          
+          const user = getUser(recieverId);          
+          io.to(user?.socketId).emit('getNotifications', {
+            senderName,
+            message
+          });
+        }
+      );
+      
   
    
   

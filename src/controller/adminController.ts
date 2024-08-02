@@ -171,7 +171,6 @@ export const postList = asyncHandler(async (req: Request, res: Response) => {
     select: 'email userName'
   }).skip(skip).limit(limit).sort({ createdAt: -1 });
 
- // Debugging: Log the posts to inspect
 
   if (posts && posts.length > 0) {
     res.status(200).json({ posts, totalPages });

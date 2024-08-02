@@ -70,9 +70,6 @@ export const getPost = asyncHandler(async (req: Request, res: Response) => {
     res.status(200).json(posts);
   });
 
-
-
-
   
   export const editPost = asyncHandler(async (req: Request, res: Response) => {
       try {
@@ -185,14 +182,8 @@ export const likePost = asyncHandler(async (req: Request, res: Response) => {
 
 
   export const getUserPost = asyncHandler(async (req: Request, res: Response) => {
-
-  
-  
     const id = req.body.userId;
-    console.log(id);
-   
-    
-  
+    console.log(id);  
     const posts = await Post.find({userId:id, isBlocked: false, isDeleted:false  }).populate({
       path: 'userId',
       select: 'userName profileImageUrl'

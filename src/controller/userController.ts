@@ -63,8 +63,6 @@ export const registerUser = asyncHandler(async (req: Request, res: Response) => 
 export const verifyOTP = asyncHandler(async (req: Request, res: Response) => {
   const { otp } = req.body;
 
-
-
   console.log(`Received OTP: ${otp}`);
   console.log(`Type of received OTP: ${typeof otp}`);
 
@@ -237,9 +235,6 @@ export const resetPsw = asyncHandler(async (req: Request, res: Response) => {
 
 
   const sessionData = req.session;
-
-
-
   if (!sessionData || !sessionData.email) {
     res.status(400);
     throw new Error('No session data found');
@@ -468,50 +463,6 @@ export const getUserDetails=asyncHandler(async(req:Request,res:Response)=>{
 })
 
 
-
-// export const searchAllCollections = asyncHandler(async (req, res) => {
-//   try {
-//     const fullData=await Job.find({})
-//     console.log(fullData);
-    
-   
-//     console.log();
-    
-//     const searchQuery = req.query.searchQuery;
- 
-//     const users = await User.find({
-//       $or: [
-//         { userName: { $regex: searchQuery, $options: 'i' } },
-//         { email: { $regex: searchQuery, $options: 'i' } }
-//       ]
-//     });
-
-//     const posts = await Post.find({
-//       $or: [
-//         { title: { $regex: searchQuery, $options: 'i' } },
-//         { description: { $regex: searchQuery, $options: 'i' } }
-//       ]
-//     }).populate('userId');
-
-//     const jobs = await Job.find({
-//       $or: [
-//         { companyName: { $regex: searchQuery, $options: 'i' } },
-//         { jobRole: { $regex: searchQuery, $options: 'i' } },
-//         { jobLocation: { $regex: searchQuery, $options: 'i' } },
-//         { requiredSkills: { $regex: searchQuery, $options: 'i' } },
-//         { jobDescription: { $regex: searchQuery, $options: 'i' } },
-//         { qualification: { $regex: searchQuery, $options: 'i' } },
-//       ],
-//     });
-
-//     res.status(200).json({ users, posts, jobs });
-    
-    
-//   } catch (error) {
-//     console.log('Error searching collections:', error);
-//     res.status(500).json({ message: 'Internal server error' });
-//   }
-// });
 
 export const searchAllCollections = asyncHandler(async (req, res) => {
   try {

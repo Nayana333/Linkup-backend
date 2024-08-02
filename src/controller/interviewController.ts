@@ -3,7 +3,6 @@ import { Request, Response } from 'express';
 import Interview from "../model/interview/interviewModel";
 import JobApplication from '../model/jobApplication/jobApplicationModel'; 
 import Job from "../model/jobs/jobModel";
-import { IJob } from "../model/jobs/jobType";
 
 
 export const getIntervieweeInterviews=  async (req: Request, res: Response): Promise<void> =>{
@@ -133,3 +132,42 @@ export const getIntervieweeInterviews=  async (req: Request, res: Response): Pro
       res.status(500).json({ message: 'Error adding interview' });
     }
   };
+
+  export const editInterview = async (req: Request, res: Response): Promise<any> => {
+    try {
+        const { interviewId, jury, interviewDate, interviewTime, status = 'Pending' } = req.body;
+
+        const interview = await Interview.findById(interviewId);
+        if (!interview) {
+            return res.status(404).json({ message: 'Interview not found' });
+        }
+
+        interview.jury = [...jury];
+        interview.interviewDate = interviewDate;
+        interview.interviewTime = interviewTime;
+        interview.status = status;
+
+        const updatedInterview = await interview.save();
+
+        const application = await JobApplication.findById(interview.applicationId);
+        if (!application) {
+            return res.status(404).json({ message: 'Job application not found' });
+        }
+
+        const job = await Job.findById(application.jobId);
+        if (!job) {
+            return res.status(404).json({ message: 'Job not found' });
+        }
+
+        const interviewerId = job.userId;
+      
+
+            const interviews = await Interview.find({ interviewerId:interviewerId }).populate('interviewerId')
+      .populate( 'intervieweeId').populate('jobId')
+
+        res.status(200).json({ message: 'Interview updated successfully', interviews});
+    } catch (error) {
+        console.error('Error editing interview:', error);
+        res.status(500).json({ message: 'Error editing interview' });
+    }
+};

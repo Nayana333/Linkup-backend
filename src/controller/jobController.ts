@@ -86,65 +86,6 @@ export const addJob =  asyncHandler(async (req: Request, res: Response): Promise
 
 
 
-  
- 
-
-
-
-  // export const listJob = async (req: Request, res: Response): Promise<void> => {
-  //   try {
-  //     const { userId, filterData } = req.body;
-  //     const searchText = filterData?.search || '';
-  
-  //     const userApplications: mongoose.Types.ObjectId[] = await JobApplication.find({
-  //       applicantId: userId,
-  //       isDeleted: { $ne: true },
-  //     }).distinct('jobId');
-  
-  //     const filterCriteria: any = {
-  //       isDeleted: { $ne: true },
-  //       userId: { $ne: userId },
-  //       isAdminBlocked: false,
-  //       isBlocked: false,
-  //       _id: { $nin: userApplications },
-  //     };
-  
-  //     if (filterData) {
-  //       if (filterData.jobRole) {
-  //         filterCriteria.jobRole = filterData.jobRole;
-  //       }
-  //       if (filterData.location) {
-  //         filterCriteria.jobLocation = filterData.location;
-  //       }
-  //       if (filterData.jobType) {
-  //         filterCriteria.jobType = filterData.jobType;
-  //       }
-  //       if (filterData.salaryRange && filterData.salaryRange != 0) {
-  //         const maxSalary = parseFloat(filterData.salaryRange);
-  //         filterCriteria.salary = { $lte: maxSalary };
-  //       }
-  //       if (filterData.experienceRange && filterData.experienceRange != 0) {
-  //         const maxExp = parseFloat(filterData.experienceRange);
-  //         filterCriteria.experience = { $lte: maxExp };
-  //       }
-  //       if (searchText.trim() !== '' && searchText !== null) {
-  //         filterCriteria.jobRole = { $regex: searchText.trim(), $options: 'i' };
-  //       }
-  //     }
-  
-  //     const jobs: IJob[] = await Job.find(filterCriteria)
-  //       .populate({ path: 'userId', select: 'username profileImageUrl' })
-  //       .sort({ createdAt: -1 }); 
-  
-  //     res.status(200).json({ jobs });
-  //   } catch (error) {
-  //     console.error('Error listing active jobs:', error);
-  //     res.status(500).json({ message: 'Internal server error' });
-  //   }
-  // };
-  
-
-
 
   export const listJob = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -188,7 +129,7 @@ export const addJob =  asyncHandler(async (req: Request, res: Response): Promise
       }
   
       const jobs: IJob[] = await Job.find(filterCriteria)
-        .populate({ path: 'userId', select: 'username profileImageUrl' })
+        .populate({ path: 'userId', select: 'userName profileImageUrl' })
         .sort({ createdAt: -1 }) 
         .skip((page - 1) * limit) 
         .limit(limit);
@@ -293,10 +234,6 @@ export const addJob =  asyncHandler(async (req: Request, res: Response): Promise
    .exec();
 
    console.log(job);
-   
-   
-   
-  
       res.status(200).json({ job });
     } catch (error) {
       console.error('Error listing active jobs:', error);
@@ -309,7 +246,6 @@ export const addJob =  asyncHandler(async (req: Request, res: Response): Promise
     try {
       const { jobId } = req.body;
   
-      // Get job details
       const job = await Job.findOne({ _id: jobId, isDeleted: { $ne: true } })
         .populate({
           path: 'userId',
@@ -317,7 +253,6 @@ export const addJob =  asyncHandler(async (req: Request, res: Response): Promise
         })
         .exec();
   
-      // Get job applications
       const applications = await JobApplication.find({ jobId,
         isDeleted: { $ne: true }}) .populate('applicantId').populate('jobId')
         .exec();
@@ -328,31 +263,7 @@ export const addJob =  asyncHandler(async (req: Request, res: Response): Promise
       res.status(500).json({ success: false, message: 'Internal server error' });
     }
   };
-  
-  // export const viewJob = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-    
-    
-  //   try {
-  //     console.log(req.body);
-      
-  //     const { jobId } = req.body;
-  //     const job = await Job.findOne({ _id: jobId, isDeleted: { $ne: true } })
-  //       .populate({
-  //         path: 'userId',
-  //         select: 'userName profileImageUrl',
-  //       })
-  //       .exec();
-  
-  //     if (!job) {
-  //        res.status(404).json({ message: 'Job details not found' });
-  //     }
-  
-  //     res.status(200).json({ job });
-  //   } catch (error: any) {  
-  //     res.status(500).json({ message: 'An error occurred', error: error.message });
-  //   }
-  // });
-  
+
 
   export const getFormSelectData = async (req: Request, res: Response): Promise<void> => {
     try {
