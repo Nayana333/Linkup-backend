@@ -1,6 +1,6 @@
 import express from 'express'
 const router=express.Router()
-import {adminLogin, adminUserList,blockUser,reportList,reportPostBlock,postList,postBlock,jobList,jobBlock,getDashboardStatus ,getAdminNotifications,chartData} from '../controller/adminController'
+import {adminLogin, adminUserList,blockUser,reportList,reportPostBlock,postList,postBlock,jobList,jobBlock,getDashboardStatus ,getAdminNotifications,chartData, diagramData} from '../controller/adminController'
 import { protectAdmin } from '../middleware/adminAuth'
 
 
@@ -16,6 +16,7 @@ router.post('/jobBlock',protectAdmin,jobBlock)
 router.get('/getDashboardStatus',protectAdmin,getDashboardStatus)
 router.get('/chartData',protectAdmin,chartData)
 router.post('/getAdminNotifications',protectAdmin,getAdminNotifications)
+router.get('/diagramData',protectAdmin,diagramData)
 
 
 export default router   

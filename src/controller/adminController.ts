@@ -12,6 +12,7 @@ import Job from '../model/jobs/jobModel';
 import { IJob } from "../model/jobs/jobType";
 import Notification from '../model/notification/notificationModel';
 import { INotification } from '../model/notification/notificationType';
+import  JobApplication from '../model/jobApplication/jobApplicationModel'
 
 
 
@@ -328,14 +329,12 @@ export const getAdminNotifications = async (req: Request, res: Response): Promis
   try {
     const adminId = req.body.adminId;
 
-    // Fetch the admin to ensure they exist
     const admin = await Admin.findById(adminId);
     if (!admin) {
       res.status(404).json({ message: 'Admin not found' });
-      return;  // Explicitly return after sending response
+      return;  
     }
 
-    // Fetch notifications intended for this admin
     const notifications = await Notification.find({ receiverId: adminId })
       .populate({
         path: 'senderId',
@@ -349,3 +348,32 @@ export const getAdminNotifications = async (req: Request, res: Response): Promis
     res.status(500).json({ message: 'Error fetching notifications' });
   }
 };
+
+export const diagramData = asyncHandler(async (req, res) => {
+  const userJoinStatus = await User.aggregate([
+    { $match: { isBlocked: false } },
+    { $group: { _id: { $dateToString: { format: "%Y-%m", date: "$createdAt" } }, userCount: { $sum: 1 } } },
+    { $sort: { _id: 1 } }
+  ]);
+
+  const appliedJobStats = await JobApplication.aggregate([
+    { $match: { isDeleted: false } },
+    { $group: { _id: { $dateToString: { format: "%Y-%m", date: "$createdAt" } }, applicationCount: { $sum: 1 } } },
+    { $sort: { _id: 1 } }
+  ]);
+
+  const jobCreationStats = await Job.aggregate([
+    { $match: { isBlocked: false, isAdminBlocked: false } },
+    { $group: { _id: { $dateToString: { format: "%Y-%m", date: "$createdAt" } }, jobCount: { $sum: 1 } } },
+    { $sort: { _id: 1 } }
+  ]);
+
+  const diagramData = {
+    jobCreationStats,
+    appliedJobStats,
+    userJoinStatus
+  };
+
+  res.status(200).json({ diagramData });
+});
+
