@@ -3,23 +3,23 @@ import mongoose, { Mongoose, Schema, model } from "mongoose";
 import ConnectionInterface from "./connectionType";
 
 
-const ConnectionSchema:Schema=new Schema({
-    userId:{
-        type:Schema.Types.ObjectId,
-        ref:'User',
-        required:true
+const ConnectionSchema: Schema = new Schema({
+    userId: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
     },
-    connections:{
-        type:[{type:Schema.Types.ObjectId,ref:'User'}],
-        default:[]
+    connections: {
+        type: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+        default: []
     },
-    requested:{
-        type:[{type:Schema.Types.ObjectId,ref:'User'}],
-        default:[]
+    requested: {
+        type: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+        default: []
     },
-    requestSent:{
-        type:[{type:Schema.Types.ObjectId,ref:'User'}],
-        default:[]
+    requestSent: {
+        type: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+        default: []
     }
 
 })
@@ -27,6 +27,6 @@ const ConnectionSchema:Schema=new Schema({
 const Connections = mongoose.model<ConnectionInterface>(
     "Connections",
     ConnectionSchema
-  );
+);
 
 export default Connections

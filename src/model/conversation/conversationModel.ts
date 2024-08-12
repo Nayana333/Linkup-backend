@@ -6,11 +6,11 @@ import { ConversationDocument } from "./conversationType";
 const ConversationSchema = new Schema<ConversationDocument>(
   {
     members: {
-        type: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+      type: [{ type: Schema.Types.ObjectId, ref: 'User' }],
       required: true,
     },
-    lastMessage:{
-      type:String
+    lastMessage: {
+      type: String
     }
   },
   { timestamps: true }

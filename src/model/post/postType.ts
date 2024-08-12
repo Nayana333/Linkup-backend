@@ -10,9 +10,9 @@ interface PostInterface extends Document {
     isHidden: boolean;
     isBlocked: boolean;
     hideComment: boolean;
-    hideLikes:boolean;
-    isDeleted:boolean;
-    isEdited:boolean;
+    hideLikes: boolean;
+    isDeleted: boolean;
+    isEdited: boolean;
     timestamp: Date;
 
 }

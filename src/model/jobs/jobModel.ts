@@ -55,7 +55,7 @@ const jobSchema: Schema<IJob> = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
-  applicants: [{  
+  applicants: [{
     type: Schema.Types.ObjectId,
     ref: 'User'
   }]

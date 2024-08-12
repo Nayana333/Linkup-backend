@@ -1,4 +1,4 @@
-import {Schema, model } from "mongoose";
+import { Schema, model } from "mongoose";
 import PremiumInterface from "./premiumType";
 
 const PremiumSchema = new Schema<PremiumInterface>({
@@ -11,11 +11,11 @@ const PremiumSchema = new Schema<PremiumInterface>({
         type: String,
         required: true
     },
-    transactionId:{
+    transactionId: {
         type: String,
         required: true
     },
-   
+
     startDate: {
         type: Date,
         default: Date.now
@@ -24,8 +24,8 @@ const PremiumSchema = new Schema<PremiumInterface>({
         type: Date,
         default: Date.now
     },
- 
-    
+
+
 });
 
 const PremiumUsers = model<PremiumInterface>('PremiumUsers', PremiumSchema);

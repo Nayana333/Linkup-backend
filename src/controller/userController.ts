@@ -87,7 +87,7 @@ export const verifyOTP = asyncHandler(async (req: Request, res: Response) => {
   const currentTime = Date.now();
   const expiredTime = 60 * 1000;
 
-  
+
 
   if (currentTime - otpGeneratedTime > expiredTime) {
     res.status(400);
@@ -106,7 +106,6 @@ export const verifyOTP = asyncHandler(async (req: Request, res: Response) => {
     password: userDetails.password
   });
 
-  // Clear session data
   delete sessionData.userDetails;
   delete sessionData.otp;
 
@@ -146,31 +145,65 @@ export const resendOTP = asyncHandler(async (req: Request, res: Response) => {
 })
 
 
-export const login = asyncHandler(async (req: Request, res: Response) => {
-  const { email, password } = req.body
-  console.log(req.body);
-  
-  const user = await User.findOne({ email })
-  if (user) {
-    if (user.isBlocked) {
-      res.status(400)
-      throw new Error('you are temporarly suspended')
-    }
+// export const login = asyncHandler(async (req: Request, res: Response) => {
+//   const { email, password } = req.body
+//   console.log(req.body);
+
+//   const user = await User.findOne({ email })
+//   if(!user){
+//     res.status(404).json({message:'no user exist'})
+//   }
+//   if (user) {
+//     if (user.isBlocked) {
+//       res.status(400)
+//       throw new Error('you are temporarly suspended')
+//     }
+//   }
+//   if (user && (await bcrypt.compare(password, user.password))) {
+//     const userData = await User.findOne({ email }, { password: 0 })
+
+//     res.json({
+//       message: 'logged successfully',
+//       user: userData,
+//       token: generateToken(user.id),
+
+//     })
+//   }
+
+
+// }) 
+
+
+export const login = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+  const { email, password } = req.body;
+
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    res.status(404).json({ message: 'No user exists with the provided email' });
+    return;
   }
-  if (user && (await bcrypt.compare(password, user.password))) {
-    const userData = await User.findOne({ email }, { password: 0 })
 
-    res.json({
-      message: 'logged successfully',
-      user: userData,
-      token: generateToken(user.id),
-
-    })
+  if (user.isBlocked) {
+    res.status(400).json({ message: 'You are temporarily suspended' });
+    return;
   }
 
+  const isMatch = await bcrypt.compare(password, user.password);
 
-})
+  if (!isMatch) {
+    res.status(401).json({ message: 'Invalid email or password' });
+    return;
+  }
 
+  const userData = await User.findOne({ email }, { password: 0 });
+
+  res.json({
+    message: 'Logged in successfully',
+    user: userData,
+    token: generateToken(user.id),
+  });
+});
 
 export const forgotPsw = asyncHandler(async (req: Request, res: Response) => {
   const { email } = req.body
@@ -315,8 +348,8 @@ export const setPreferences = async (req: Request, res: Response) => {
   try {
     const { userId, userType, isHiring } = req.body;
     console.log(req.body);
-    
-    
+
+
     const user = await User.findOne({ _id: userId });
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -325,7 +358,7 @@ export const setPreferences = async (req: Request, res: Response) => {
       user.isHiring = isHiring === 'isHiring';
 
       await user.save();
-      res.status(200).json({ message: 'User updated',user });
+      res.status(200).json({ message: 'User updated', user });
     }
   } catch (error) {
     console.error("Error in updating user", error);
@@ -340,7 +373,7 @@ export const setPreferences = async (req: Request, res: Response) => {
 export const basicInformation = async (req: Request, res: Response) => {
   try {
 
-    const {userId, imageUrl } = req.body;
+    const { userId, imageUrl } = req.body;
 
     const user = await User.findById(userId);
     if (!user) {
@@ -358,107 +391,107 @@ export const basicInformation = async (req: Request, res: Response) => {
       user.profile.gender = gender;
       user.profile.about = about;
     } else if (user.userType === "organization") {
-      const { fullname, location, phone, about,noOfEmployees,establishedOn,companyType} = req.body;
-           console.log(companyType);
-           
+      const { fullname, location, phone, about, noOfEmployees, establishedOn, companyType } = req.body;
+      console.log(companyType);
+
       user.companyProfile.companyName = fullname;
       user.companyProfile.companyLocation = location;
       user.companyProfile.aboutCompany = about;
-      user.companyProfile.establishedOn=establishedOn;
-      user.companyProfile.noOfEmployees=noOfEmployees;
-      user.companyProfile.companyType=companyType;
+      user.companyProfile.establishedOn = establishedOn;
+      user.companyProfile.noOfEmployees = noOfEmployees;
+      user.companyProfile.companyType = companyType;
       user.phone = phone;
     } else {
       return res.status(400).json({ message: 'Invalid user type' });
     }
 
     if (imageUrl) {
-      
-      
+
+
       console.log(imageUrl);
-      
+
       user.profileImageUrl = imageUrl;
     }
 
     await user.save();
-    const userData= await User.findOne({_id:userId},{password:0})
-    
-    res.status(200).json({ message: 'Basic information updated successfully', user:userData });
+    const userData = await User.findOne({ _id: userId }, { password: 0 })
+
+    res.status(200).json({ message: 'Basic information updated successfully', user: userData });
   } catch (error) {
     console.error('Error updating basic information:', error);
     res.status(500).json({ message: 'Internal server error' });
   }
 };
 
-export const setUserRole=async(req:Request,res:Response)=>{
-  try{
-    const{userId,isHiring}=req.body
-    const user=await User.findById(userId)
-    if(!user){return res.status(404).json({message:'user not found'})}
-  user.isHiring=isHiring
-await user.save()
-res.status(200).json({message:'user updated successfully',user})
-  }catch(error){
-    console.log('error updating user:',error);
-    res.status(500).json({message:'Internal server error'})
-    
+export const setUserRole = async (req: Request, res: Response) => {
+  try {
+    const { userId, isHiring } = req.body
+    const user = await User.findById(userId)
+    if (!user) { return res.status(404).json({ message: 'user not found' }) }
+    user.isHiring = isHiring
+    await user.save()
+    res.status(200).json({ message: 'user updated successfully', user })
+  } catch (error) {
+    console.log('error updating user:', error);
+    res.status(500).json({ message: 'Internal server error' })
+
   }
 
 }
 
 
-export const userSuggestions=asyncHandler((async(req:Request,res:Response)=>{
-  const {userId}=req.body
- 
-  const connection=await Connections.findOne({userId})
-  
+export const userSuggestions = asyncHandler((async (req: Request, res: Response) => {
+  const { userId } = req.body
 
-  if(!connection){
+  const connection = await Connections.findOne({ userId })
+
+
+  if (!connection) {
     const users = await User.find({
       _id: { $ne: userId },
       isBlocked: false
     });
-    console.log(users,'userssss');
+    console.log(users, 'userssss');
 
-        res.status(200).json({suggestedUsers:users})
+    res.status(200).json({ suggestedUsers: users })
     return
   }
-  
-
-  const followingIds=connection.connections.map((user:any)=>user._id);
-  const requestedIds=connection.requestSent.map((user:any)=>user._id)
 
 
-  const suggestedUsers=await User.find({
-    _id:{$nin:[...followingIds,...requestedIds,userId]}
+  const followingIds = connection.connections.map((user: any) => user._id);
+  const requestedIds = connection.requestSent.map((user: any) => user._id)
+
+
+  const suggestedUsers = await User.find({
+    _id: { $nin: [...followingIds, ...requestedIds, userId] }
   },
-  {password:0}
-)
-res.status(200).json({suggestedUsers})
+    { password: 0 }
+  )
+  res.status(200).json({ suggestedUsers })
 }))
 
 
 
 
-export const getUserDetails=asyncHandler(async(req:Request,res:Response)=>{
+export const getUserDetails = asyncHandler(async (req: Request, res: Response) => {
 
-  try{
+  try {
 
-    const {userId}=req.params
+    const { userId } = req.params
 
-    const user=await User.findById(userId).populate('profile').populate('companyProfile')
+    const user = await User.findById(userId).populate('profile').populate('companyProfile')
 
-    const connections=await Connections.findOne({userId:userId})
+    const connections = await Connections.findOne({ userId: userId })
 
-    if(user){
-      res.status(200).json({user,connections})
+    if (user) {
+      res.status(200).json({ user, connections })
     }
-    else{
-      res.status(400).json({message:'user not found'})
+    else {
+      res.status(400).json({ message: 'user not found' })
     }
-  }catch(error:any){
+  } catch (error: any) {
     console.log(error);
-    
+
   }
 
 })
@@ -505,29 +538,29 @@ export const searchAllCollections = asyncHandler(async (req, res) => {
 
 
 interface NotificationData extends INotification {
-  senderConnections?: any[]; 
+  senderConnections?: any[];
 }
 
 export const getNotifications = async (req: Request, res: Response): Promise<void> => {
 
-  try{
-    const userId=req.body.userId;
-    const connections=await Connections.findOne({userId})
-    const userConnections:any[]=connections?.connections ||[]
+  try {
+    const userId = req.body.userId;
+    const connections = await Connections.findOne({ userId })
+    const userConnections: any[] = connections?.connections || []
 
     const notifications: NotificationData[] = await Notification.find({ receiverId: userId }).populate({
       path: 'senderId',
       select: 'userName profileImageUrl'
-    }).sort({createdAt:-1})
-console.log(notifications);
+    }).sort({ createdAt: -1 })
+    console.log(notifications);
 
     res.status(200).json({ notifications: notifications });
 
-  }catch(error){
+  } catch (error) {
     console.error('Error fetching notifications:', error);
     res.status(500).json({ message: 'Error fetching notifications' });
   }
-  
+
 }
 
 

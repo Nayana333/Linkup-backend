@@ -27,10 +27,10 @@ const protectAdmin = asyncHandler(
           throw new Error("Not authorized");
         }
 
-        req.user = decoded; 
+        req.user = decoded;
 
         next();
-      } catch (error:any) {
+      } catch (error: any) {
         console.log(error);
         if (error.name === "TokenExpiredError") {
           res.status(401);

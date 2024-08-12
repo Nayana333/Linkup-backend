@@ -1,5 +1,5 @@
-import {Schema, model } from "mongoose";
-import jobApplicationInterface  from "./jobApplicationType";
+import { Schema, model } from "mongoose";
+import jobApplicationInterface from "./jobApplicationType";
 
 const jobApplicationSchema = new Schema<jobApplicationInterface>({
     applicantId: {
@@ -12,15 +12,15 @@ const jobApplicationSchema = new Schema<jobApplicationInterface>({
         ref: 'Job',
         required: true
     },
-    applicationStatus:{
+    applicationStatus: {
         type: String,
         required: true,
-        default:"Pending"
+        default: "Pending"
     },
-   isDeleted:{
+    isDeleted: {
         type: Boolean,
-     
-        default:false
+
+        default: false
     },
     coverLetter: {
         type: String,
@@ -30,14 +30,14 @@ const jobApplicationSchema = new Schema<jobApplicationInterface>({
         type: String,
         required: true
     },
-    isInterviewScheduled:{
-        type:Boolean,
-        default:false
+    isInterviewScheduled: {
+        type: Boolean,
+        default: false
     }
- 
-    
-},{timestamps:true});
 
-const Jobs = model<jobApplicationInterface>('Application',jobApplicationSchema);
+
+}, { timestamps: true });
+
+const Jobs = model<jobApplicationInterface>('Application', jobApplicationSchema);
 
 export default Jobs;

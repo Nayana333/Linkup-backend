@@ -1,6 +1,6 @@
 
 import { Schema, model, Document, Types } from 'mongoose';
-import {ReplyCommentInterface , CommentInterface }from './commentType'
+import { ReplyCommentInterface, CommentInterface } from './commentType'
 
 const ReplyCommentSchema = new Schema<ReplyCommentInterface>({
   userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
@@ -10,28 +10,28 @@ const ReplyCommentSchema = new Schema<ReplyCommentInterface>({
 
 
 const CommentSchema = new Schema<CommentInterface>({
-    postId: {
-      type: Schema.Types.ObjectId,
-      ref: 'Post',
-      required: true,
-    },
-    userId: {
-      type: Schema.Types.ObjectId,
-      ref: 'User',
-      required: true,
-    },
-    comment: {
-      type: String,
-      required: true,
-    },
-    isDeleted: {
-      type: Boolean,
-      default: false,
-    },
-    replyComments: [ReplyCommentSchema]
- 
-  },{timestamps:true});
-  
-  const Comment = model<CommentInterface>('Comment', CommentSchema);
-  
-  export default Comment;
+  postId: {
+    type: Schema.Types.ObjectId,
+    ref: 'Post',
+    required: true,
+  },
+  userId: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
+  },
+  comment: {
+    type: String,
+    required: true,
+  },
+  isDeleted: {
+    type: Boolean,
+    default: false,
+  },
+  replyComments: [ReplyCommentSchema]
+
+}, { timestamps: true });
+
+const Comment = model<CommentInterface>('Comment', CommentSchema);
+
+export default Comment;

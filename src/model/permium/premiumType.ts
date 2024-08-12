@@ -5,7 +5,7 @@ interface PremiumInterface extends Document {
     transactionId: string;
     startDate: Date;
     expiryDate: Date;
-    amount:string;  
+    amount: string;
 }
 
 export default PremiumInterface;

@@ -8,17 +8,17 @@ const MessageSchema = new Schema<MessageDocument>(
       required: true,
     },
     sender: {
-        type: Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: true
     },
     text: {
       type: String,
       required: true,
     },
-    isRead:{
-      type:Boolean,
-      default:false
+    isRead: {
+      type: Boolean,
+      default: false
     }
   },
   { timestamps: true }

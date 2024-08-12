@@ -1,4 +1,4 @@
-import {Schema, model } from "mongoose";
+import { Schema, model } from "mongoose";
 import PostInterface from "./postType";
 
 const PostSchema = new Schema<PostInterface>({
@@ -11,7 +11,7 @@ const PostSchema = new Schema<PostInterface>({
         type: String,
         required: true
     },
-    title:{
+    title: {
         type: String,
         required: true
     },
@@ -35,24 +35,24 @@ const PostSchema = new Schema<PostInterface>({
         type: Boolean,
         default: false
     },
-    hideComment:{
-        type:Boolean,
-        default:false
+    hideComment: {
+        type: Boolean,
+        default: false
     },
-    hideLikes:{
-        type:Boolean,
-        default:false
+    hideLikes: {
+        type: Boolean,
+        default: false
     },
-    isDeleted:{
-        type:Boolean,
-        default:false
+    isDeleted: {
+        type: Boolean,
+        default: false
     },
-    isEdited:{
-        type:Boolean,
-        default:false
+    isEdited: {
+        type: Boolean,
+        default: false
     }
-    
-},{timestamps:true});
+
+}, { timestamps: true });
 
 const Post = model<PostInterface>('Post', PostSchema);
 
