@@ -21,8 +21,10 @@ const socketIo_Config = (io: any) => {
       };
   
       const addUser = (userId: string, socketId: string) => {
-        !users.some((user) => user.userId === userId) &&
+        console.log(userId,socketId,"::??>>??>>??>>>???>>???>>??>???>??>")
+        if(!users.find((user) => user.userId === userId)){
           users.push({ userId, socketId });
+        }
       };
   
       const getUser = (userId: string) => {

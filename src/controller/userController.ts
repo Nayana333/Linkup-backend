@@ -63,6 +63,8 @@ export const registerUser = asyncHandler(async (req: Request, res: Response) => 
 
 export const verifyOTP = asyncHandler(async (req: Request, res: Response) => {
   const { otp } = req.body;
+  
+  
 
   console.log(`Received OTP: ${otp}`);
   console.log(`Type of received OTP: ${typeof otp}`);
