@@ -34,7 +34,8 @@ const socketIo_Config = (io: any) => {
       //when connect
       socket.on("addUser", (userId: string) => {
         addUser(userId, socket.id);
-        console.log(users)        
+        console.log(users) 
+        socket.join(userId)       
         io.emit("getUsers", users);
       });
   
@@ -57,7 +58,7 @@ const socketIo_Config = (io: any) => {
           const user = getUser(receiverId);
           console.log("SEnding this message to ",user?.socketId)
           
-          io.to(user?.socketId).emit("getMessage", {
+          io.to(user?.userId).emit("getMessage", {
             senderId,
             text,
             createdAt
