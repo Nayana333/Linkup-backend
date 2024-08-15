@@ -74,7 +74,8 @@ export const verifyOTP = asyncHandler(async (req: Request, res: Response) => {
     throw new Error('Cannot receive OTP');
   }
 
-  const sessionData = req.session!;
+  const sessionData = req.session;
+  console.log(sessionData)
   const storedOTP = sessionData.otp;
 
   console.log(`Stored OTP: ${storedOTP}`);
