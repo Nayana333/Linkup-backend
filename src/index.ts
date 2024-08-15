@@ -12,10 +12,9 @@ import postRoutes from './routes/postRoutes';
 import jobRoutes from './routes/jobRoute';
 import connectionRoutes from './routes/connectionRoutes';
 import chatRoute from './routes/chatRoute';
-import { Server, Socket } from 'socket.io';
+import { Server } from 'socket.io';
 import socketIo_Config from './utils/socket/socket';
-import { Sequelize } from 'sequelize';
-import connectSessionSequelize from 'connect-session-sequelize';
+import MongoStore from 'connect-mongo';
 
 dotenv.config();
 
@@ -23,17 +22,7 @@ const app: Express = express();
 const PORT = process.env.PORT || 3000;
 const server = http.createServer(app);
 
-// Initialize Sequelize
-const sequelize = new Sequelize({
-  dialect: 'mysql', 
-  host: process.env.DB_HOST,
-  database: process.env.DB_NAME,
-  username: process.env.DB_USER,
-  password: process.env.DB_PASS,
-});
-
-const SequelizeStore = connectSessionSequelize(session.Store); 
-
+connectDB();
 declare module 'express-session' {
   interface Session {
     userDetails?: { userName: string, email: string, password: string };
@@ -49,17 +38,12 @@ app.use(session({
   secret: sessionSecret,
   resave: false,
   saveUninitialized: true,
-  store: new SequelizeStore({
-    db: sequelize,
-    checkExpirationInterval: 15 * 60 * 1000,
-    expiration: 24 * 60 * 60 * 1000,
+  store: MongoStore.create({
+    mongoUrl: process.env.MONGO_URI,
+    ttl: 24 * 60 * 60,
+    autoRemove: 'native',
   }),
-  proxy: true,
-  name: 'linkup',
   cookie: {
-    secure: true,
-    httpOnly: false,
-    sameSite: 'none',
     maxAge: 24 * 60 * 60 * 1000 // 24 hours
   }
 }));
@@ -94,9 +78,6 @@ app.use('/api/chat', chatRoute);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// Connect to database
-connectDB();
 
 app.use(errorHandler);
 
