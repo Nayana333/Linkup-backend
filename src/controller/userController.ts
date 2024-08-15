@@ -75,7 +75,7 @@ export const verifyOTP = asyncHandler(async (req: Request, res: Response) => {
   }
 
   const sessionData = req.session;
-  console.log(sessionData)
+  console.log(sessionData,":::::::")
   const storedOTP = sessionData.otp;
 
   console.log(`Stored OTP: ${storedOTP}`);
