@@ -32,14 +32,19 @@ declare module 'express-session' {
   }
 }
 const sessionSecret = process.env.SESSION_SECRET || 'default_secret_value'
-
+app.enable("trust proxy")
 app.use(session({
   secret: sessionSecret,
   resave: false,
   saveUninitialized: true,
+  proxy: true,
+  name: 'linkup',
   cookie: {
+    secure: true,
+    httpOnly: false,
+    sameSite: 'none',
     maxAge: 24 * 60 * 60 * 1000,
-  },
+  }
 }));
 
 app.use(express.json());
