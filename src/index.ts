@@ -15,7 +15,7 @@ import chatRoute from './routes/chatRoute';
 import { Server, Socket } from 'socket.io';
 import socketIo_Config from './utils/socket/socket';
 import { Sequelize } from 'sequelize';
-import connectSessionSequelize from 'connect-session-sequelize'; // Import connect-session-sequelize
+import connectSessionSequelize from 'connect-session-sequelize';
 
 dotenv.config();
 
@@ -25,17 +25,15 @@ const server = http.createServer(app);
 
 // Initialize Sequelize
 const sequelize = new Sequelize({
-  // Your Sequelize configuration here (e.g., database, username, password)
-  dialect: 'mysql', // or 'postgres', 'sqlite', etc.
+  dialect: 'mysql', 
   host: process.env.DB_HOST,
   database: process.env.DB_NAME,
   username: process.env.DB_USER,
   password: process.env.DB_PASS,
 });
 
-const SequelizeStore = connectSessionSequelize(session.Store); // Initialize SequelizeStore
+const SequelizeStore = connectSessionSequelize(session.Store); 
 
-// Extend session with custom properties
 declare module 'express-session' {
   interface Session {
     userDetails?: { userName: string, email: string, password: string };
@@ -52,9 +50,9 @@ app.use(session({
   resave: false,
   saveUninitialized: true,
   store: new SequelizeStore({
-    db: sequelize, // Pass the Sequelize instance
-    checkExpirationInterval: 15 * 60 * 1000, // 15 minutes
-    expiration: 24 * 60 * 60 * 1000, // 24 hours
+    db: sequelize,
+    checkExpirationInterval: 15 * 60 * 1000,
+    expiration: 24 * 60 * 60 * 1000,
   }),
   proxy: true,
   name: 'linkup',
