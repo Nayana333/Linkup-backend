@@ -383,7 +383,7 @@ export const transactionList=asyncHandler(async(req:Request,res:Response)=>{
   const page: number = parseInt(req.query.page as string, 10) || 1;
   const limit: number = 6;
   const skip: number = (page - 1) * limit;
-
+ 
   const totalTransactions=await PremiumUsers.countDocuments()
   const totalPages=Math.ceil(totalTransactions/limit)
 
@@ -394,7 +394,9 @@ export const transactionList=asyncHandler(async(req:Request,res:Response)=>{
 
   if(transaction.length>0){
     res.status(200).json({transaction,totalPages})
+  }else{
+    res.status(404).json({message:'no transactions'})
+
   }
-  res.status(404).json({message:'no transactions'})
 
 })
