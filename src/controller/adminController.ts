@@ -391,12 +391,13 @@ export const transactionList=asyncHandler(async(req:Request,res:Response)=>{
     path:'userId',
     select:'userName profileImageUrl email isPremium'
   })
-
-  if(transaction.length>0){
-    res.status(200).json({transaction,totalPages})
-  }else{
-    res.status(404).json({message:'no transactions'})
-
+  if(!transaction)
+  {
+    throw new Error('no transaction')
   }
+
+  
+    res.status(200).json({transaction,totalPages})
+  
 
 })
