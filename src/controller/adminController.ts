@@ -63,10 +63,6 @@ export const adminUserList = asyncHandler(async (req: Request, res: Response) =>
 });
 
 
-
-
-
-
 export const blockUser = asyncHandler(async (req: Request, res: Response) => {
   const { userId } = req.body;
   console.log(req.body);

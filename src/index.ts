@@ -76,7 +76,7 @@ app.use('/api/job', jobRoutes);
 app.use('/api/connect', connectionRoutes);
 app.use('/api/chat', chatRoute);
 
-app.use(express.json());
+app.use(express.json()); 
 app.use(express.urlencoded({ extended: true }));
 
 app.use(errorHandler);
