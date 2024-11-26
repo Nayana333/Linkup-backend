@@ -51,7 +51,7 @@ app.use(session({
 app.use(express.json());
 
 const io: Server = new Server(server, {
-  cors: { origin: '*' }
+  cors: { origin:process.env.ORIGIN}
 });
 socketIo_Config(io);
 
